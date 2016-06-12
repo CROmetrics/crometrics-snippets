@@ -40,7 +40,7 @@
 				}else if (key == 'dev_notes' || key == 'notes'){
 					experiment_json[key] = val;
 				}else if (key == 'variations' || key == 'target_urls' || key == 'audience_targeting' || key == 'goals'){
-					experiment_json[key] = val.split(/\n+/g).slice(0,-1);//throw out last value
+					experiment_json[key] = val.split(/\n+/g);
 				}
 			}
 			if (experiment_json.target_urls.length) experiment_json.edit_url = experiment_json.target_urls[0];
