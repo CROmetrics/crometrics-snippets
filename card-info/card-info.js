@@ -1,4 +1,5 @@
 (function(){
+	var popup = window.open('about:blank');
 	var xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange = function() {
 		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -47,7 +48,10 @@
 			if (experiment_json.edit_url.length && experiment_json.edit_url.substr(0,4).toLowerCase() != 'http')
 				experiment_json.edit_url = 'http://' + experiment_json.edit_url;
 			console.log(experiment_json);
-			prompt('experiment.json file contents:', JSON.stringify(experiment_json, null, 2));
+			//Note: Prompt limits the content to 2000 characters!
+			// prompt('experiment.json file contents:', JSON.stringify(experiment_json, null, 2));
+			popup.location = 'data:text/html;base64,' + btoa('<html contenteditable><pre>'+JSON.stringify(experiment_json, null, 2)+'</pre><script>document.execCommand(\'selectAll\');document.execCommand(\'copy\');</script></html>');
+			// popup.location = 'data:application/json;charset=utf-8,'+JSON.stringify(experiment_json, null, 2);
 		}
 	};
 	xmlhttp.open("GET", location.href + '.json', true);
