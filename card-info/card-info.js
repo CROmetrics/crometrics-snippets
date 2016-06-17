@@ -50,7 +50,10 @@
 			console.log(experiment_json);
 			//Note: Prompt limits the content to 2000 characters!
 			// prompt('experiment.json file contents:', JSON.stringify(experiment_json, null, 2));
-			popup.location = 'data:text/html;base64,' + btoa('<html contenteditable><pre>'+JSON.stringify(experiment_json, null, 2)+'</pre><script>document.execCommand(\'selectAll\');document.execCommand(\'copy\');</script></html>');
+			
+			var command = 'crowrap new json ' + btoa(JSON.stringify(experiment_json));
+			var html = '<html><pre>'+JSON.stringify(experiment_json, null, 2)+'</pre><div id="command" contenteditable>'+command+'</div><script>document.getElementById(\'command\').focus();document.execCommand(\'selectAll\');document.execCommand(\'copy\');</script></html>';
+			popup.location = 'data:text/html;base64,' + btoa(html);
 			// popup.location = 'data:application/json;charset=utf-8,'+JSON.stringify(experiment_json, null, 2);
 		}
 	};
