@@ -16,6 +16,7 @@
             var clean_desc = data.desc.replace(/”|“/g,'"').replace(/[\u00A0-\u2666]/g, function(c) {
                 return '&#' + c.charCodeAt(0) + ';';
             });
+            var url_test = /(https?:\/\/)?[^\. ]+(\.[^\.\/ ]+)+[^\s(\[]+/g;
             var split = clean_desc.split(/\*\*([\w ]+):? ?\*\*\n*/g);
             var key;
             for (var v in split){
@@ -43,15 +44,14 @@
                     experiment_json['target_urls'] = [val];
                 }else if (key == 'dev_notes' || key == 'notes'){
                     experiment_json[key] = val;
+                }else if (key == 'target_urls'){
+                    experiment_json[key] = val.match(url_test);
                 }else if (key == 'variations' || key == 'target_urls' || key == 'audience_targeting' || key == 'goals'){
                     experiment_json[key] = val.split(/\n+/g);
                 }
             }
             if (experiment_json.target_urls.length){
-                var url_str = experiment_json.target_urls[0],
-                    url_str_match = url_str.match(/(https?:\/\/)?[^\.]+(\.[^\.\/]+)+[^ (\[]+/g);
-
-                if (url_str_match.length) experiment_json.edit_url = url_str_match[0];
+                experiment_json.edit_url = experiment_json.target_urls[0];
             }
             if (experiment_json.edit_url.length && experiment_json.edit_url.substr(0,4).toLowerCase() != 'http')
                 experiment_json.edit_url = 'http://' + experiment_json.edit_url;
