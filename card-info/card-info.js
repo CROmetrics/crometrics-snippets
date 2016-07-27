@@ -16,7 +16,7 @@
             var clean_desc = data.desc.replace(/”|“/g,'"').replace(/[\u00A0-\u2666]/g, function(c) {
                 return '&#' + c.charCodeAt(0) + ';';
             });
-            var url_test = /(https?:\/\/)?[^\. ]+(\.[^\.\/ ]+)+[^\s(\[]+/g;
+            var url_test = /(https?:\/\/)?[^\.\s]+(\.[^\.\/\s]+)+[^\s(\[]+/g;
             var split = clean_desc.split(/\*\*([\w ]+):? ?\*\*\n*/g);
             var key;
             for (var v in split){
@@ -40,11 +40,10 @@
                     }
                     if (variations.length) experiment_json['variations'] = variations;
                     experiment_json[key] = hypothesis;
-                }else if (key == 'target_url'){//single url
-                    experiment_json['target_urls'] = [val];
                 }else if (key == 'dev_notes' || key == 'notes'){
                     experiment_json[key] = val;
-                }else if (key == 'target_urls'){
+                }else if (key == 'target_urls' || key == 'target_url'){
+                    key = 'target_urls';
                     experiment_json[key] = val.match(url_test);
                 }else if (key == 'variations' || key == 'target_urls' || key == 'audience_targeting' || key == 'goals'){
                     experiment_json[key] = val.split(/\n+/g);
