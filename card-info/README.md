@@ -43,7 +43,8 @@ crowrap new json TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2N
 
 Running the command will initialize an experiment directory with the experiment.json shown above. It also generates the appropriate number of variations, filling in their description information.
 
+###Development notes
+In order to come up with the bookmarklet version I've been putting the code into [babel](https://babeljs.io/repl/) then run it through [compression](http://jscompress.com/), then slap `javascript:` at the start of the line.
 
 ###Wishlist
-It would be nice if the data url display allowed you to make changes to the json data displayed in the upper portion, and that would automatically regenerate the crowrap command below. This way you could easily fix little errors before running the crowrap command.
 

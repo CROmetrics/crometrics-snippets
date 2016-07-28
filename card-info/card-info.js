@@ -58,8 +58,31 @@
             //Note: Prompt limits the content to 2000 characters!
             // prompt('experiment.json file contents:', JSON.stringify(experiment_json, null, 2));
             
-            var command = 'crowrap new json ' + btoa(JSON.stringify(experiment_json));
-            var html = '<html><pre>'+JSON.stringify(experiment_json, null, 2)+'</pre><div id="command" contenteditable>'+command+'</div><script>document.getElementById(\'command\').focus();document.execCommand(\'selectAll\');document.execCommand(\'copy\');</script></html>';
+            var script = `
+            var _code = document.getElementById('code'),
+                _command = document.getElementById('command');
+            
+            function refresh(){
+                try{
+                    var json = JSON.parse(_code.innerHTML);
+                    _command.innerHTML = 'crowrap new json ' + btoa(JSON.stringify(json));
+                }catch(ex){
+                    _command.innerHTML = 'INVALID JSON';
+                }
+            }
+            refresh();
+            _command.focus();
+            document.execCommand('selectAll');
+            document.execCommand('copy');
+
+            document.addEventListener('keyup', function (e) {
+                console.log('pressed', e);
+                if (e.key != 'Meta' && e.key != 'Control'){
+                    refresh();
+                }
+            });
+            `;
+            var html = '<html><pre><code id="code" style="display: block;" contenteditable>'+JSON.stringify(experiment_json, null, 2)+'</code></pre><div id="command" contenteditable></div><script>'+script+'</script></html>';
             popup.location = 'data:text/html;base64,' + btoa(html);
             // popup.location = 'data:application/json;charset=utf-8,'+JSON.stringify(experiment_json, null, 2);
         }
