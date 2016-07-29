@@ -47,4 +47,4 @@ Running the command will initialize an experiment directory with the experiment.
 In order to come up with the bookmarklet version I've been putting the code into [babel](https://babeljs.io/repl/) then run it through [compression](http://jscompress.com/), then slap `javascript:` at the start of the line.
 
 ###Wishlist
-
+David suggested that it would be nice to have the PM + Engineer name get exported into the experiment.json file.
