@@ -44,7 +44,7 @@
                     experiment_json[key] = val;
                 }else if (key == 'target_urls' || key == 'target_url'){
                     key = 'target_urls';
-                    experiment_json[key] = val.match(url_test);
+                    experiment_json[key] = val.match(url_test) || [];//Needs a fallback
                 }else if (key == 'variations' || key == 'target_urls' || key == 'audience_targeting' || key == 'goals'){
                     experiment_json[key] = val.split(/\n+/g);
                 }
