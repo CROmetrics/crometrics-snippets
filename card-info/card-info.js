@@ -13,7 +13,7 @@
                 'hypothesis': '',
                 'target_urls': [],
             };
-            var clean_desc = data.desc.replace(/”|“/g,'"').replace(/[\u00A0-\u2666]/g, function(c) {
+            var clean_desc = data.desc.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/”|“/g,'"').replace(/[\u00A0-\u2666]/g, function(c) {
                 return '&#' + c.charCodeAt(0) + ';';
             });
             var url_test = /(https?:\/\/)?[^\.\s]+(\.[^\.\/\s]+)+[^\s(\[]+/g;
