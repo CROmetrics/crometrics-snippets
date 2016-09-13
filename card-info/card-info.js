@@ -9,9 +9,9 @@
         'description': data.name,
         'edit_url': '',
         // 'id': '',
-        'trello_card': data.url,
         'hypothesis': '',
         'target_urls': [],
+        'trello_card': data.url,
         'members': [],
       };
 
@@ -20,7 +20,8 @@
         return '&#' + c.charCodeAt(0) + ';';
       });
       var url_test = /(https?:\/\/)?[^\.\s]+(\.[^\.\/\s]+)+[^\s(\[]+/g;
-      var split = clean_desc.split(/\*\*([\w ]+):? ?\*\*\n*/g);
+      //Some cards are using ####headers, some are using **bold** headings: 
+      var split = /^##+ ?/.test(clean_desc) ? clean_desc.split(/##+ ?([\w ]+):? ?\n*/g) : clean_desc.split(/\*\*([\w ]+):? ?\*\*\n*/g);
       var key;
       for (var v in split){
         var val = split[v].trim();
@@ -60,8 +61,12 @@
       
       //Add the members list to the json:
       if (data.members && data.members.length){
-        for (var m in data.members){
-          
+        for (const member of data.members){
+          experiment_json.members.push({
+            'fullName': member.fullName,
+            'initials': member.initials,
+            'username': member.username
+          });
         }
       }
 
@@ -100,6 +105,7 @@
       // popup.location = 'data:application/json;charset=utf-8,'+JSON.stringify(experiment_json, null, 2);
     }
   };
-  xmlhttp.open("GET", location.href + '.json', true);
+  //Note: don't use location.href because it can include #, which messes up the .json part.
+  xmlhttp.open("GET", location.origin + location.pathname + '.json', true);
   xmlhttp.send();
 })();
