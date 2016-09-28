@@ -1,4 +1,15 @@
+"use strict";
 (function(){
+  var clean_utf8 = function(string){
+    return string
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/”|“/g,'"')
+      .replace(/’/g,'\'')
+      .replace(/[\u00A0-\u2666]/g, function(c) {
+        return '&#' + c.charCodeAt(0) + ';';
+      });
+  };
   var popup = window.open('about:blank');
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.onreadystatechange = function() {
@@ -6,7 +17,7 @@
       var data = JSON.parse(xmlhttp.responseText);
       // console.log(data);
       var experiment_json = {
-        'description': data.name,
+        'description': clean_utf8(data.name),
         'edit_url': '',
         // 'id': '',
         'hypothesis': '',
@@ -16,9 +27,7 @@
       };
 
       //Begin parsing the card description:
-      var clean_desc = data.desc.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/”|“/g,'"').replace(/[\u00A0-\u2666]/g, function(c) {
-        return '&#' + c.charCodeAt(0) + ';';
-      });
+      var clean_desc = clean_utf8(data.desc);
       var url_test = /(https?:\/\/)?[^\.\s]+(\.[^\.\/\s]+)+[^\s(\[]+/g;
       //Some cards are using ####headers, some are using **bold** headings: 
       var split = /^##+ ?/.test(clean_desc) ? clean_desc.split(/##+ ?([\w ]+):? ?\n*/g) : clean_desc.split(/\*\*([\w ]+):? ?\*\*\n*/g);
@@ -100,7 +109,7 @@
         }
       });
       `;
-      var html = '<html><pre><code id="code" style="display: block;" contenteditable>'+JSON.stringify(experiment_json, null, 2)+'</code></pre><div id="command" contenteditable></div><script>'+script+'</script></html>';
+      var html = '<html><b>You can modify this json, and the command will automatically update below:</b><pre><code id="code" style="display: block;" contenteditable>'+JSON.stringify(experiment_json, null, 2)+'</code></pre><div id="command" contenteditable style="background: #eee"></div><script>'+script+'</script></html>';
       popup.location = 'data:text/html;base64,' + btoa(html);
       // popup.location = 'data:application/json;charset=utf-8,'+JSON.stringify(experiment_json, null, 2);
     }
