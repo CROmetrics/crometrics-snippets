@@ -1,12 +1,15 @@
 Card Info Snippet
 =====
 
-This is a bookmarklet that will attempt to generate a fancy `experiment.json` file for you based on info it finds in an experiment trello card.
-The snippet should be run when viewing the experiment card.
+This bookmarklet will attempt to generate an `experiment.json` file for you based on info it finds in an experiment Trello card. This information can then be used to spin up a new experiment directory using [CroWrap](https://github.com/CROmetrics/crowrap).
 
-It opens a prompt window containing the json code that can then be copied to experiment.json.
+## Installation:
+Create a new bookmark in your browser, and point the url to the contents of [bookmarklet.js](https://raw.githubusercontent.com/CROmetrics/crometrics-snippets/master/card-info/bookmarklet.js).
 
-The output currently looks something like this:
+## Usage:
+Run the bookmarklet when viewing an experiment card in Trello from your browser.
+
+This will open a new browser tab containing information like the following:
 ```
 {
   "description": "WIN-22: Landing Win On All The Page",
@@ -36,11 +39,12 @@ The output currently looks something like this:
 }
 ```
 
-Below the JSON it shows a massive [crowrap](https://github.com/CROmetrics/crowrap) command:
+Below the JSON it shows a massive [crowrap](https://github.com/CROmetrics/crowrap) command, like this:
 ```
 crowrap new json TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4gVmVzdGlidWx1bSBzY2VsZXJpc3F1ZSBtb2xsaXMganVzdG8gc2l0IGFtZXQgY3Vyc3VzLiBVdCBub24gbmliaCBleC4gUHJhZXNlbnQgZWdlc3RhcyBwbGFjZXJhdCBkdWkgdml0YWUgbGFvcmVldC4gU2VkIGJsYW5kaXQgbWF1cmlzIHZpdGFlIG51bGxhIGV1aXNtb2QgdGluY2lkdW50LiBFdGlhbSBjdXJzdXMsIGFudGUgc2VkIGF1Y3RvciBwZWxsZW50ZXNxdWUsIHNlbSBleCBwbGFjZXJhdCBsb3JlbSwgdmVsIGdyYXZpZGEgb2RpbyB0b3J0b3Igc2VkIGV4LiBTZWQgY29udmFsbGlzIG1hc3NhIGVnZXQgc29sbGljaXR1ZGluIGVsZW1lbnR1bS4gVml2YW11cyB1bHRyaWNpZXMgbmliaCB2ZWwgbGVjdHVzIGxvYm9ydGlzIHBvc3VlcmUuIFNlZCBibGFuZGl0IGxvcmVtIGFjIHRpbmNpZHVudCBhbGlxdWFtLiBQcmFlc2VudCBtYXR0aXMgbmlzbCB2ZWwgZXggdmVzdGlidWx1bSB0aW5jaWR1bnQuIEN1cmFiaXR1ciBhbGlxdWFtIGV1IGVsaXQgYWMgc29kYWxlcy4gU3VzcGVuZGlzc2UgbWF4aW11cyBxdWFtIGVsaXQsIGVnZXQgdHJpc3RpcXVlIG1hc3NhIGN1cnN1cyBuZWMuIEluIGVsZW1lbnR1bSBsYWN1cyBuaXNpLCBxdWlzIHJob25jdXMgc2VtIGludGVyZHVtIG5vbi4gUGVsbGVudGVzcXVlIGF0IGRpYW0gc2l0IGFtZXQgdG9ydG9yIHZ1bHB1dGF0ZSB2YXJpdXMuIFByYWVzZW50IGFsaXF1ZXQgbWF1cmlzIG5lYyBsaWJlcm8gZmFjaWxpc2lzIGNvbnNlcXVhdC4gVml2YW11cyBuaWJoIG1hZ25hLCBwb3J0YSBldSBjb252YWxsaXMgc2l0IGFtZXQsIGVsZWlmZW5kIHZlbCBlcmF0Lg==
 ```
 
+Copy the provided command, and paste it into your console while in the appropriate client's folder. 
 Running the command will initialize an experiment directory with the experiment.json shown above. It also generates the appropriate number of variations, filling in their description information.
 
 ###Development notes
