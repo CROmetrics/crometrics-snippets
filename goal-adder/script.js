@@ -1,24 +1,29 @@
 (function() {
-    let list = prompt('Paste in goals, one per line and they will be added to the experiment:').split('\n');
-    // let list = ["Completed Application (WFS + EPT)", "Completed Zip Code (WFS + EPT)", "Reached", "Engagement", "Scheduled Training", "Showed up to Training", "Contracted"];
+    let input_list = prompt('Paste in goals, one per line and they will be added to the experiment:').split('\n');
+    let input_list = ["Completed Application (WFS + EPT) (primary)", "Completed Zip Code (WFS + EPT)", "Reached", "Engagement", "Scheduled Training", "Showed up to Training", "Contracted"];
+
+    //A little cleanup first:
+    input_list.map((val)=>{
+        return val.replace(/\s*[\[{(]primary[)}\]]\s*$/i, '');
+    });
 
     let projectId = window.optly.page.experiment.projectId,
         experimentId = window.optly.page.experiment.experimentId;
-    // let modal_state = window.optly.page.goalDialog.stateStack;
+    let modal_state = window.optly.page.goalDialog.stateStack;
 
     function get_state(){
         return modal_state[modal_state.length-1].mode;
     }
 
     function already_added(title){
-        let index = list.indexOf(title);
-        if (list[index]) list.splice(index, 1);
+        let index = input_list.indexOf(title);
+        if (input_list[index]) input_list.splice(index, 1);
     }
 
     let get_goals_api = `https://app.optimizely.com/api/project/${projectId}/goal.json?unaddable_included_experiment_id=${experimentId}`;
     let post_goals_api = `https://app.optimizely.com/api/experiments/${experimentId}/goal.json`;
 
-    if (!list.length) return;
+    if (!input_list.length) return;
 
     $.get(get_goals_api, function(results){
         let goals_to_be_added = [];
@@ -33,9 +38,9 @@
 
         var unfound = [];
 
-        for (var i in list){
+        for (var i in input_list){
             let found_goal;
-            let item = list[i];
+            let item = input_list[i];
             for (var g in goals){ //Dat efficiency
                 let goal = goals[g];
                 if (goal.title === item){
