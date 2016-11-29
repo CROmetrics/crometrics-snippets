@@ -91,10 +91,11 @@
       
       function refresh(){
         try{
-          var json = JSON.parse(_code.innerHTML);
+          var json = JSON.parse(_code.innerText);
           _command.innerHTML = 'crowrap new json ' + btoa(JSON.stringify(json));
         }catch(ex){
           _command.innerHTML = 'INVALID JSON';
+          console.error(ex);
         }
       }
       refresh();
@@ -103,7 +104,6 @@
       document.execCommand('copy');
 
       document.addEventListener('keyup', function (e) {
-        console.log('pressed', e);
         if (e.key != 'Meta' && e.key != 'Control'){
           refresh();
         }
