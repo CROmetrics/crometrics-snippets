@@ -1,6 +1,6 @@
 (function() {
     let input_list = prompt('Paste in goals, one per line and they will be added to the experiment:').split('\n');
-    let input_list = ["Completed Application (WFS + EPT) (primary)", "Completed Zip Code (WFS + EPT)", "Reached", "Engagement", "Scheduled Training", "Showed up to Training", "Contracted"];
+    // let input_list = ["Completed Application (WFS + EPT) (primary)", "Completed Zip Code (WFS + EPT)", "Reached", "Engagement", "Scheduled Training", "Showed up to Training", "Contracted"];
 
     //A little cleanup first:
     input_list.map((val)=>{
