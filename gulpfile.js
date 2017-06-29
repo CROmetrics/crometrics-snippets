@@ -10,11 +10,11 @@ gulp.task('compile', () => {
   };
 
   return new Promise(function(resolve /*, reject*/ ) {
-    gulp.src(['*/!(_|bookmarklet)*.js'])
+    gulp.src(['*/*.es6'])
       .pipe(babel({
           presets: ['es2015', 'babili']
       }))
-      .pipe(rename({suffix: ".min",}))
+      .pipe(rename({suffix: ".min",extname: '.js'}))
       .pipe(gulp.dest('.'))
       .on('end', function(){
         resolve();
