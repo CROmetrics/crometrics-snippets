@@ -1,7 +1,7 @@
 # crometrics-snippets
 Collection of CROmetrics snippets and patterns
 
-### esper - Optimizely Espionage Tool
+### esper - Optimizely Analysis Tool
 Originally based on this: https://gist.github.com/danest/73eda651cd4fb4ec76fb/
 
 Install the <a href="javascript:(($)=>$&&$.getScript&&$.getScript('https://crometrics.github.io/crometrics-snippets/esper/esper.min.js')||alert('Error: Unable to load script. jQuery is required.'))(window.jQuery||window.$||window.optimizely&&(window.optimizely.$||window.optimizely.get&&window.optimizely.get('jquery')));">bookmarklet</a>:
