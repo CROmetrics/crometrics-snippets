@@ -1,16 +1,19 @@
 # crometrics-snippets
 Collection of CROmetrics snippets and patterns
 
+### Optimizely Goal Adder
+Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/goal-adder/goals.min.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>.
+
+Usage: Run the bookmarklet from Optimizely classic's edit experiment UI.
+
 ### esper - Optimizely Analysis Tool
 ![Optimizely Analysis Tool](http://i.imgur.com/c1dmh17.png)
 
 Bookmarklet originally based on: https://gist.github.com/danest/73eda651cd4fb4ec76fb/
 
-Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/esper/esper.min.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>:
+Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/esper/esper.min.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>.
 
-```
-javascript:fetch('https://crometrics.github.io/crometrics-snippets/esper/esper.min.js').then(r=>r.text()).then(t=>new Function(t)());
-```
+Usage: Run the bookmarklet on a site that has optimizely running.
 
 ### Feasibility Utilities
 ***Usage:*** Run the snippet and look at the console log.
@@ -26,11 +29,7 @@ Description: In case you ever have a reference and you need to know what functio
 Usage: `window.feasibility.injectFeelers(obj, ignoreKeys = [])`
 
 #### Install:
-Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/feasibility/utilities.min.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>:
-
-```
-javascript:fetch('https://crometrics.github.io/crometrics-snippets/feasibility/utilities.min.js').then(r=>r.text()).then(t=>new Function(t)())
-```
+Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/feasibility/utilities.min.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>.
 
 ### The Button
 A tampermonkey/greasemonkey script that adds a button to the optimizely interface. [More info](/the-button)
