@@ -12,7 +12,8 @@ gulp.task('compile', () => {
   return new Promise(function(resolve /*, reject*/ ) {
     gulp.src(['*/*.es6'])
       .pipe(babel({
-          presets: ['es2015', 'babili']
+          presets: ['babili'],//'es2015', 
+          plugins: ['transform-es2015-template-literals']
       }))
       .pipe(rename({suffix: ".min",extname: '.js'}))
       .pipe(gulp.dest('.'))
