@@ -6,36 +6,46 @@
   const COLORS = ["success", "danger", "warning", "primary", "info"];
   const end = "";
 
-  class Esper{
+  class Esper extends HTMLElement{
     constructor(){
-      $("#opt_container,#opt_styles,#opt_backdrop").remove();
-      $("head").append(Esper.stylesheet);
-      this.$container = $("<div id='opt_container'/>").appendTo($('body'));
+      super();
+      let shadow = this.attachShadow({mode: 'open'});
+
+      // $("#opt_container,#opt_styles,#opt_backdrop").remove();
+      $(shadow).append(Esper.stylesheet);
+      this.$container = $("<div id='opt_container'/>").appendTo(shadow);
       this.$backdrop = $("<div id='opt_backdrop'/>").click(function (){
         this.$container.remove();
         this.$backdrop.remove();
-      }).appendTo($('body'));
+      }).appendTo(shadow);
       if (!window.optimizely) return this.$container.append("<h1>Error: Missing Optimizely.</h1>");
       if (!$) return this.$container.append("<h1>Error: Missing jQuery.</h1>");
       
       //TODO: USE window.optimizely.get('data')
-      let X = !!window.optimizely.get;
       let data = window.optimizely.data || {};
       let xData = window.optimizely.get && window.optimizely.get('data') || {};
+
+      this.X = !!window.optimizely.get;
+      this.C = !!window.optimizely.getAccountId;
       this.state = data.state || {};
       this.audiences = data.audiences || {};
+      this.xAudiences = xData.audiences || {};
       this.variations = data.variations || {};
+      this.xVariations = xData.variations || {};
       this.experiments = data.experiments || {};
+      this.xExperiments = xData.experiments || {};
+      this.xCampaigns = xData.campaigns || {};
       this.segments = data.segments || {};
       this.visitor = data.visitor || {};
       this.accountId = xData.accountId || window.optimizely.getAccountId();
+      this.revision = optimizely.revision || xData.revision;
 
       this.launch();
       $(window).resize(this.resize);
       this.resize();
     }
     resize(){
-      var w = $(window).width(), h = $(window).height();
+      let w = $(window).width(), h = $(window).height();
       this.$container.css({
         height: h / 1.25 + "px",
         width: w / 1.5 + "px",
@@ -45,59 +55,88 @@
     }
     launch() {
       let $display = $(`
-        <div id='ooo_container' class='container'>
-          <section id='ooo_container_visitors' class='container'>
-            <div class='well'><br>
-              <h1 class='header center'>This Site: <b>${window.location.host}</b></h1>
-              <div id='account_stats' class='row'>
-                <p class='col-xs-3'>
-                  <u>Total Experiments</u><br><span>${Object.keys(this.experiments).length}</span></p>
-                <p class='col-xs-3'>
-                  <u>Approx. Library Size</u><br><span>${(JSON.stringify(window.optimizely).length / 1e3).toFixed()} KB</span></p>
-                <p class='col-xs-3'>
-                  <u>Total Variations</u><br><span>${Object.keys(this.variations).length}</span></p>
-                <p class='col-xs-3'>
-                  <u>Account Owner</u><br><span>${this.accountId}</span></p>
+        <div id="ooo_container" class="container">
+          <section id="ooo_container_visitors" class="container">
+            <div class="well"><br>
+              <h1 class="header center">This Site: <b>${window.location.host}</b></h1>
+              <div id='account_stats' class="row">
+                <div class="col">
+                  <div>${this.X?'OptX(✔)':'OptX(✗)'}</div><div>${this.C?'Classic(✔)':'Classic(✗)'}</div>
+                </div>
+                <div class="col">
+                  <u>Account Owner</u><br><span>${this.accountId}</span>
+                </div>
+                <div class="col">
+                  <u>Snippet Revision</u><br><span>${this.revision}</span>
+                </div>
+                <div class="col">
+                  <u>Approx. Library Size</u><br><span>${(JSON.stringify(window.optimizely).length / 1e3).toFixed()} KB</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <u>X Experiments</u><br><span>${Object.keys(this.xExperiments).length}</span>
+                </div>
+                <div class="col">
+                  <u>X Variations</u><br><span>${Object.keys(this.xVariations).length}</span>
+                </div>
+                <div class="col">
+                  <u>X Audiences</u><br><span>${Object.keys(this.xAudiences).length}</span>
+                </div>
+                <div class="col">
+                  <u>X Campaigns</u><br><span>${Object.keys(this.xCampaigns).length}</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <u>Classic Experiments</u><br><span>${Object.keys(this.experiments).length}</span>
+                </div>
+                <div class="col">
+                  <u>Classic Variations</u><br><span>${Object.keys(this.variations).length}</span>
+                </div>
+                <div class="col">
+                  <u>Classic Audiences</u><br><span>${Object.keys(this.audiences).length}</span>
+                </div>
               </div>
             </div><br>
-            <div id='ooo_filters' class='row center'>
-              <div class='btn-group' data-toggle='buttons'>
-                <span style='font-weight:bolder;font-size:16px;'>Experiment Status:&emsp;</span>
-                <button class='btn info btn-info' filter='all'>ALL EXPERIMENTS</button>
-                <button class='btn info btn-info' filter='live'>LIVE EXPERIMENTS</button>
-                <button class='btn info btn-info' filter='paused'>PAUSED EXPERIMENTS</button>
+            <div id="ooo_filters" class="row center">
+              <div class="btn-group" data-toggle="buttons">
+                <span style="font-weight:bolder;font-size:16px;">Experiment Status:&emsp;</span>
+                <button class="btn info btn-info" filter="all">ALL EXPERIMENTS</button>
+                <button class="btn info btn-info" filter="live">LIVE EXPERIMENTS</button>
+                <button class="btn info btn-info" filter="paused">PAUSED EXPERIMENTS</button>
               </div><br>
-              <div id='view_people' class='btn-group' data-toggle='button'>
-                <span style='font-weight:bolder;font-size:16px;'>Browse Visitor Criteria:&emsp;</span>
-                <button class='btn btn-warning' show='ooo_audiences' id='view_audiences'>AUDIENCES</button>
-                <button class='btn btn-warning' show='ooo_visitor_you' id='view_visitor_you'>YOUR SEGMENTS</button>
-                <button class='btn btn-warning' show='ooo_visitor_all' id='view_visitor_all'>ALL SEGMENTS</button>
-                <button class='btn btn-warning btn-lg' show='my_variants' id='show_my_variants'>MY EXPERIENCE</button>
+              <div id="view_people" class="btn-group" data-toggle="button">
+                <span style="font-weight:bolder;font-size:16px;">Browse Visitor Criteria:&emsp;</span>
+                <button class="btn btn-warning" show="ooo_audiences" id="view_audiences">AUDIENCES</button>
+                <button class="btn btn-warning" show="ooo_visitor_you" id="view_visitor_you">YOUR SEGMENTS</button>
+                <button class="btn btn-warning" show="ooo_visitor_all" id="view_visitor_all">ALL SEGMENTS</button>
+                <button class="btn btn-warning btn-lg" show="my_variants" id="show_my_variants">MY EXPERIENCE</button>
               </div>
               <hr>
-              <section id='ooo_container_visitor' class='container'>
-                <div class='row-fluid'>
-                  <div style='display:none;' id='ooo_audiences' class='well blue col-xs-12'>
-                    <a class='closeme'>CLOSE</a> ${this.renderAudiences()}
+              <section id="ooo_container_visitor" class="container">
+                <div class="row-fluid">
+                  <div style="display:none;" id="ooo_audiences" class="well blue col-xs-12">
+                    <a class="closeme">CLOSE</a> ${this.renderAudiences()}
                   </div>
-                  <div style='display:none;' id='ooo_visitor_you' class='well blue col-xs-12'>
-                    <a class='closeme'>CLOSE</a> ${this.renderYourSegments()}
+                  <div style="display:none;" id="ooo_visitor_you" class="well blue col-xs-12">
+                    <a class="closeme">CLOSE</a> ${this.renderYourSegments()}
                   </div>
-                  <div style='display:none;' id='ooo_visitor_all' class='well blue col-xs-12'>
-                    <a class='closeme'>CLOSE</a> ${this.renderAllSegments()}
+                  <div style="display:none;" id="ooo_visitor_all" class="well blue col-xs-12">
+                    <a class="closeme">CLOSE</a> ${this.renderAllSegments()}
                   </div>
-                  <div id='my_variants' class='center well alert alert-info' style='display:none'>
-                    <a class='closeme'>CLOSE</a> ${this.renderMyVariants()}
+                  <div id="my_variants" class="center well alert alert-info" style="display:none">
+                    <a class="closeme">CLOSE</a> ${this.renderMyVariants()}
                   </div>
                 </div>
               </section>
 
             </div>
-            <div id='alert' class='center well alert alert-warning' style='display:none;'>
-              <a class='closeme'>CLOSE</a>
+            <div id="alert" class="center well alert alert-warning" style="display:none;">
+              <a class="closeme">CLOSE</a>
             </div>
           </section>
-          <section id='ooo_containerExperiments' class='container'>
+          <section id="ooo_containerExperiments" class="container">
           </section>
         </div>
       `).appendTo(this.$container);
@@ -114,7 +153,7 @@
       });
       $display.find("[filter]").click(function (){
         $display.find("[experiment_id]").hide();
-        var filter = $(this).attr("filter");
+        let filter = $(this).attr("filter");
         $display.find("#ooo_container_visitor > div > div").hide();
         let $experiments = $displayExperiments.find("." + filter + "Experiment").show();
         if ($experiments.length){
@@ -124,7 +163,7 @@
         }
       });
       $display.find("#view_people button").click(function (){
-        var $this = $(this),
+        let $this = $(this),
           t = $this.attr("show"),
           r = $display.find("#" + t),
           i = r.is(":visible");
@@ -133,7 +172,7 @@
         $display.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
       });
       $display.find("#show_my_variants").click(function (){
-        var $this = $(this),
+        let $this = $(this),
           t = $display.find($this.attr("show")),
           r = t.is(":visible");
         t.css("display", r ? "none" : "block");
@@ -148,7 +187,7 @@
       return this.isExperiment(id) ? this.experiments[id].name : false;
     }
     addExperiment(id) {
-      var experiment = this.experiments[id] || {},
+      let experiment = this.experiments[id] || {},
         variations = experiment.variation_ids || {},
         varCount = Object.keys(variations).length,
         active = ~$.inArray(id, this.state.activeExperiments);
@@ -180,7 +219,7 @@
     }
     renderYourSegments() {
       if (!this.visitor.segments) return "<h2 class='center'><label class='badge badge-danger'>You are not part of any segments!</label></h2>";
-      var r = this.visitor.segments,
+      let r = this.visitor.segments,
         i = 0,
         s = "<h2>Here are the segments you are part of: </h2><br><br>";
       $.each(r, (n, r)=>{
@@ -192,7 +231,7 @@
     }
     renderAllSegments() {
       if (!this.segments) return "<h2 class='center'><label class='badge badge-danger'>There are no segments created.</label></h2>";
-      var r = "<h2>Here are all segments being targeted towards on this site: </h2><hr>",
+      let r = "<h2>Here are all segments being targeted towards on this site: </h2><hr>",
         i = 0;
       $.each(this.segments, (n, s)=>{
         r += "<label class='segment col-sm-5 label label-" + COLORS[i] + "'>" + this.segments[n].name + "</label>";
@@ -201,7 +240,7 @@
       return r;
     }
     renderMyVariants() {
-      var t = window.optimizely.variationNamesMap || {},
+      let t = window.optimizely.variationNamesMap || {},
         r = 0,
         i = "<h2>Here are the tests and variations you are currently a part of!</h2>";
       if (!t || !Object.keys(t).length) return "<h2 class='center'><label class='badge badge-danger'>You are not in any experiments! Shame...</label></h2>";
@@ -213,7 +252,7 @@
     }
     renderAudiences() {
       if (!this.audiences) return "<h2 class='center'><label badge badge-danger'>There are no audiences created.</label></h2>";
-      var r = 0,
+      let r = 0,
         i = "<h2>Here are all audiences being observed in analytics on this site: </h2><hr>";
       $.each(this.audiences, (t, n)=>{
         i += "<label class='segment col-sm-5 label label-" + COLORS[r] + "'>" + n.name + "</label>";
@@ -223,12 +262,12 @@
     }
     renderVariationsSection(eId) { //was render_experiment_page
       let experiment = this.experiments[eId];
-      var $variations = $("<div/>");
+      let $variations = $("<div/>");
       $.each(experiment.variation_ids, (index, vId)=>{
         let name = this.variations[vId].name;
         let code =  this.variations[vId].code;
         let previewLink = (()=>{
-          var link = location.href;
+          let link = location.href;
           link += (link.split("?")[1] ? "&" : "?") + "optimizely_x" + eId + "=" + index;
           return `<a href="${link}" class="pull-right btn btn-primary" target="_blank">Preview Variation</a>`;
         })();
@@ -280,11 +319,10 @@
           min-height: 300px;
           z-index: 99999999;
         }
-        #account_stats>p {
+        .well .col {
           width: 25%;
           float: left;
           text-align: center;
-          font-size: 20px;
         }
         .center {
           text-align: center;
@@ -409,5 +447,11 @@
       </style>`;
     }
   }
-  window.esper = new Esper();
-}
+  // Define the new element
+  let int = Math.random().toString().substr(2), name = 'optimizely-analysis-'+int;
+  customElements.define(name, Esper);
+  if (window.esper) document.body.removeChild(window.esper);
+  let esper = document.createElement(name);
+  document.body.appendChild(esper);
+  window.esper = esper;
+};
