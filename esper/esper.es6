@@ -465,8 +465,6 @@
   // Define the new element
   let int = Math.random().toString().substr(2), name = 'optimizely-analysis-'+int;
   customElements.define(name, Esper);
-  if (window.esper) document.body.removeChild(window.esper);
   let esper = document.createElement(name);
   document.body.appendChild(esper);
-  window.esper = esper;
 })();
