@@ -20,9 +20,8 @@
 
       // $("#opt_container,#opt_styles,#opt_backdrop").remove();
       this.$container = $("<div id='opt_container'/>");
-      this.$backdrop = $("<div id='opt_backdrop'/>").click(function (){
-        this.$container.remove();
-        this.$backdrop.remove();
+      this.$backdrop = $("<div id='opt_backdrop'/>").click(()=>{
+        this.remove();
       });
       
       
