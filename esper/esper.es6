@@ -1,7 +1,12 @@
 /* jshint esversion: 6 */
-{
+(function(){
   'use strict';
   let $ = window.jQuery || window.$ || window.optimizely && window.optimizely.$;
+
+  if (!$ || !$.fn || !$.fn.jquery){
+    alert('jQuery is required, but not found.');
+    return;
+  }
 
   const COLORS = ["success", "danger", "warning", "primary", "info"];
   const end = "";
@@ -9,15 +14,23 @@
   class Esper extends HTMLElement{
     constructor(){
       super();
-      let shadow = this.attachShadow({mode: 'open'});
+      let shadow = this.attachShadow({mode: 'closed'});
+      let stylesheet = document.createElement('style');
+      stylesheet.innerHTML = Esper.styles
 
       // $("#opt_container,#opt_styles,#opt_backdrop").remove();
-      $(shadow).append(Esper.stylesheet);
-      this.$container = $("<div id='opt_container'/>").appendTo(shadow);
+      this.$container = $("<div id='opt_container'/>");
       this.$backdrop = $("<div id='opt_backdrop'/>").click(function (){
         this.$container.remove();
         this.$backdrop.remove();
-      }).appendTo(shadow);
+      });
+      
+      
+      //note: old jQuery isn't able to work with the shadow dom, so do it native.
+      shadow.appendChild(stylesheet);
+      shadow.appendChild(this.$container[0]);
+      shadow.appendChild(this.$backdrop[0]);
+
       if (!window.optimizely) return this.$container.append("<h1>Error: Missing Optimizely.</h1>");
       if (!$) return this.$container.append("<h1>Error: Missing jQuery.</h1>");
       
@@ -294,8 +307,12 @@
     htmlspecialchars(e) {
       return e.replace(/&/g, "&").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
-    static stylesheet(){
-      return `<style id='opt_styles'>
+    static get styles(){
+      return `
+        :host{
+          font-size: 13px;
+        }
+
         #opt_backdrop {
           position: fixed;
           top: 0;
@@ -327,7 +344,7 @@
         .center {
           text-align: center;
         }
-        #opt_container code {
+        code {
           padding: 2px 4px;
           font-size: 90%;
           color: #c7254e;
@@ -335,102 +352,102 @@
           white-space: nowrap;
           border-radius: 4px;
         }
-        #opt_container .container {
+        .container {
           width: 100% !important;
         }
-        #opt_container b {
+        b {
           font-weight: bold !important;
         }
-        #opt_container label {
+        label {
           display: inline-block;
           margin: 5px;
           padding: 5px;
           border-radius: 3px;
           color: black;
         }
-        #opt_container .btn {
+        .btn {
           padding: 10px;
           border-radius: 2px;
           -webkit-border-radius: 2px;
           cursor: pointer;
           border: 1px solid transparent;
         }
-        #opt_container .btn-info,
-        #opt_container .label-info {
+        .btn-info,
+        .label-info {
           background: #428bca;
           border-color: #357ebd;
         }
-        #opt_container .btn-info:hover,
-        #opt_container .label-info:hover {
+        .btn-info:hover,
+        .label-info:hover {
           background: #3276b1;
           border-color: #285e8e;
         }
-        #opt_container .btn-success,
-        #opt_container .label-success {
+        .btn-success,
+        .label-success {
           background: #5cb85c;
           border-color: #4cae4c;
         }
-        #opt_container .btn-success:hover,
-        #opt_container .label-success:hover {
+        .btn-success:hover,
+        .label-success:hover {
           background: #47a447;
           border-color: #398439;
         }
-        #opt_container .btn-warning,
-        #opt_container .label-warning {
+        .btn-warning,
+        .label-warning {
           background: #f0ad4e;
           border-color: #eea236
         }
-        #opt_container .btn-warning:hover,
-        #opt_container .label-warning:hover {
+        .btn-warning:hover,
+        .label-warning:hover {
           background: #ed9c28;
           border-color: #d58512;
         }
-        #opt_container .btn-danger,
-        #opt_container .label-danger {
+        .btn-danger,
+        .label-danger {
           background: #d9534f;
           border-color#d43f3a;
         }
-        #opt_container .btn-danger:hover,
-        #opt_container .label-danger:hover {
+        .btn-danger:hover,
+        .label-danger:hover {
           background: #d2322d;
           border-color#ac2925;
         }
-        #opt_container .btn-primary,
-        #opt_container .label-primary {
+        .btn-primary,
+        .label-primary {
           background: #428bca;
           color: black !important;
           border-color: #357ebd;
         }
-        #opt_container .btn-primary:hover,
-        #opt_container .label-primary:hover {
+        .btn-primary:hover,
+        .label-primary:hover {
           background: #3276b1;
           border-color#285e8e;
         }
-        #opt_container pre {
+        pre {
           width: 95%;
           overflow: hidden;
           word-wrap: break-word;
         }
-        #opt_container .row {
+        .row {
           width: 100%;
           display: inline-block;
           margin: 0;
           padding: 5px;
         }
-        #opt_container .well {
+        .well {
           background-color: #f5f5f5;
           padding: 10px;
           border: 1px solid #e3e3e3;
           box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
           -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
         }
-        #opt_container .pull-right {
+        .pull-right {
           float: right
         }
-        #opt_container .pull-left {
+        .pull-left {
           float: left;
         }
-        #opt_container .closeme {
+        .closeme {
           position: relative;
           top: -7px;
           right: -47%;
@@ -441,10 +458,9 @@
           border-radius: 8px;
           padding: 4px;
         }
-        #opt_container .segment {
+        .segment {
           float:none
-        }
-      </style>`;
+        }`;
     }
   }
   // Define the new element
@@ -454,4 +470,4 @@
   let esper = document.createElement(name);
   document.body.appendChild(esper);
   window.esper = esper;
-};
+})();
