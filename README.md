@@ -8,6 +8,13 @@ This bookmarklet helps to add a list of goals to a classic experiment. You click
 
 ***Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/goal-adder/goals.min.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>.***
 
+## Inject Webcam bookmarklet
+Adds your webcam to a webpage (sticky bottom left).
+
+***Usage:*** Run the bookmarklet on a https site.
+
+***Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/webcam/init.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>.***
+
 ## esper - Optimizely Analysis Tool
 ![Optimizely Analysis Tool](http://i.imgur.com/c1dmh17.png)
 This opens a panel which displays information about the optimizely snippet running on the active page.
