@@ -47,6 +47,8 @@
         }
         video{
           width: 50vh;
+          -webkit-transform: scaleX(-1);
+          transform: scaleX(-1);
         }
       `;
     }
