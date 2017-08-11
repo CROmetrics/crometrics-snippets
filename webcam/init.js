@@ -46,6 +46,7 @@
           background: white;
         }
         video{
+          z-index: 9000;
           width: 50vh;
         }
       `;
