@@ -1,10 +1,12 @@
-/* jshint esversion: 6 */
-(function(){
+(function start(){
   'use strict';
-  let $ = window.jQuery || window.$ || window.optimizely && window.optimizely.$;
+  let $ = window.jQuery;
 
   if (!$ || !$.fn || !$.fn.jquery){
-    alert('jQuery is required, but not found.');
+    fetch('https://code.jquery.com/jquery-3.2.1.min.js').then(r=>r.text()).then(t=>{
+      new Function(t)();
+      start();
+    });
     return;
   }
 
@@ -14,60 +16,141 @@
   class Esper extends HTMLElement{
     constructor(){
       super();
+      this.forensics();
+    }
+    forensics(){
+      if (window.optimizely){
+        this.optimizely = {};
+        if (window.optimizely.data && !window.optimizely.data.note){
+          this.optimizely.accountId = window.optimizely.getAccountId();
+          this.optimizely.revision = window.optimizely.revision;
+          this.optimizely.classic = {
+            state: data.state || {},
+            audiences: data.audiences || {},
+            variations: data.variations || {},
+            experiments: data.experiments || {},
+            segments: data.segments || {},
+            visitor: data.visitor || {},
+          };
+        }
+        if (window.optimizely.get){
+          let data = window.optimizely.get('data');
+          this.optimizely.accountId = data.accountId;
+          this.optimizely.revision = data.revision;
+          this.optimizely.X = {
+           audiences: data.audiences || {},
+           variations: data.variations || {},
+           experiments: data.experiments || {},
+           campaigns: data.campaigns || {},
+          };
+        }
+      }
+
+      // let data = window.optimizely.data || {};
+      // let xData = window.optimizely.get && window.optimizely.get('data') || {};
+
+      // this.X = !!window.optimizely.get;
+      // this.C = !!window.optimizely.getAccountId;
+      // this.state = data.state || {};
+      // this.audiences = data.audiences || {};
+      // this.xAudiences = xData.audiences || {};
+      // this.variations = data.variations || {};
+      // this.xVariations = xData.variations || {};
+      // this.experiments = data.experiments || {};
+      // this.xExperiments = xData.experiments || {};
+      // this.xCampaigns = xData.campaigns || {};
+      // this.segments = data.segments || {};
+      // this.visitor = data.visitor || {};
+      // this.accountId = xData.accountId || window.optimizely.getAccountId();
+      // this.revision = optimizely.revision || xData.revision;
+    }
+
+    connectedCallback(){
       let shadow = this.attachShadow({mode: 'closed'});
       let stylesheet = document.createElement('style');
-      stylesheet.innerHTML = Esper.styles
+      stylesheet.innerHTML = require("./esper.css");
 
       // $("#opt_container,#opt_styles,#opt_backdrop").remove();
       this.$container = $("<div id='opt_container'/>");
       this.$backdrop = $("<div id='opt_backdrop'/>").click(()=>{
         this.remove();
       });
-      
-      
-      //note: old jQuery isn't able to work with the shadow dom, so do it native.
+
+      // note: old jQuery isn't able to work with the shadow dom, so do it native.
       shadow.appendChild(stylesheet);
       shadow.appendChild(this.$container[0]);
       shadow.appendChild(this.$backdrop[0]);
 
-      if (!window.optimizely) return this.$container.append("<h1>Error: Missing Optimizely.</h1>");
-      if (!$) return this.$container.append("<h1>Error: Missing jQuery.</h1>");
-      
-      //TODO: USE window.optimizely.get('data')
-      let data = window.optimizely.data || {};
-      let xData = window.optimizely.get && window.optimizely.get('data') || {};
-
-      this.X = !!window.optimizely.get;
-      this.C = !!window.optimizely.getAccountId;
-      this.state = data.state || {};
-      this.audiences = data.audiences || {};
-      this.xAudiences = xData.audiences || {};
-      this.variations = data.variations || {};
-      this.xVariations = xData.variations || {};
-      this.experiments = data.experiments || {};
-      this.xExperiments = xData.experiments || {};
-      this.xCampaigns = xData.campaigns || {};
-      this.segments = data.segments || {};
-      this.visitor = data.visitor || {};
-      this.accountId = xData.accountId || window.optimizely.getAccountId();
-      this.revision = optimizely.revision || xData.revision;
+      // if (!window.optimizely) return this.$container.append("<h1>Error: Missing Optimizely.</h1>");
+      // if (!$) return this.$container.append("<h1>Error: Missing jQuery.</h1>");
 
       this.launch();
-      $(window).resize(this.resize);
-      this.resize();
+      // this.textContent = 'Just a basic custom element.';
+    } 
+    disconnectedCallback(){
+
+    } 
+    attributeChangedCallback() {
+
     }
-    resize(){
-      let w = $(window).width(), h = $(window).height();
-      this.$container.css({
-        height: h / 1.25 + "px",
-        width: w / 1.5 + "px",
-        "margin-top": "-" + h / 2.5 + "px",
-        "margin-left": "-" + w / 3 + "px"
-      });
-    }
+
     launch() {
-      let $display = $(`
-        <div id="ooo_container" class="container">
+      let $display = $(`<div id="ooo_container" class="container"></div>`).appendTo(this.$container);
+      this.$stats().appendTo($display);
+
+      let $tabs = $(`<div id="tabs">`).appendTo($display);
+      let $links = $(`<ul class="links">`).appendTo($tabs);
+
+      $tabs.append(`<div id="tabs-1">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil molestiae soluta praesentium rerum accusantium commodi necessitatibus porro omnis, ipsum aspernatur, corporis unde reiciendis quas dolor quae? Tenetur aut quia rerum.</p>
+          </div>`);
+      $links.append(`<li><a href="#tabs-1">tab1</a></li>`);
+
+      $tabs.append(`<div id="tabs-2">
+            <p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+          </div>`);
+      $links.append(`<li><a href="#tabs-2">tab2</a></li>`);
+
+      // if (this.optimizely){
+      //   if (this.optimizely.classic){
+      //     this.$optimizely().appendTo($display);
+      //   }
+      // }
+    }
+
+    $stats(){
+      let $section = $(
+      `<section class="container">
+        <div class="well">
+          <h1 class="header center">${window.location.host}</h1>
+          <div id="account_stats" class="row">
+            
+          </div>
+        </div>
+      </section>`);
+      let $info = $section.find('#account_stats');
+      if (this.optimizely){
+        let hasX = this.optimizely && this.optimizely.X, hasClassic = this.optimizely && this.optimizely.classic;
+        $info.append(
+        `<div class="col">
+          <div>${hasX?'OptX(✔)':'OptX(✗)'}</div><div>${hasClassic?'Classic(✔)':'Classic(✗)'}</div>
+        </div>`);
+        // <div class="col">
+        //   <u>Account Owner</u><br><span>${this.accountId}</span>
+        // </div>
+        // <div class="col">
+        //   <u>Snippet Revision</u><br><span>${this.revision}</span>
+        // </div>
+        // <div class="col">
+        //   <u>Approx. Library Size</u><br><span>${(JSON.stringify(window.optimizely).length / 1e3).toFixed()} KB</span>
+        // </div>
+      }
+      return $section;
+    }
+
+    $optimizelyClassic(){
+      let $optimizely = $(`
+        <div class="optimizely">
           <section id="ooo_container_visitors" class="container">
             <div class="well"><br>
               <h1 class="header center">This Site: <b>${window.location.host}</b></h1>
@@ -144,53 +227,54 @@
               </section>
 
             </div>
-            <div id="alert" class="center well alert alert-warning" style="display:none;">
-              <a class="closeme">CLOSE</a>
-            </div>
-          </section>
-          <section id="ooo_containerExperiments" class="container">
+            
           </section>
         </div>
-      `).appendTo(this.$container);
-
-      let $displayExperiments = $display.find('#ooo_containerExperiments'),
-          $alert = $display.find("#alert");
+      `);
+      let $optimizelyExperiments = $('<section id="ooo_containerExperiments" class="container"></section>').appendTo($optimizely),
+          $alert = $(`
+            <div id="alert" class="center well alert alert-warning" style="display:none;">
+              <a class="closeme">CLOSE</a>
+            </div>`).appendTo($optimizely);
 
       $.each(this.getExperimentId().reverse(), (e, t)=>{
-        $displayExperiments.append(this.addExperiment(t));
+        $optimizelyExperiments.append(this.addExperiment(t));
       });
-      $display.find(".closeme").click(function (){
+      $optimizely.find(".closeme").click(function (){
         $(this).parent().hide();
-        $display.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
+        $optimizely.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
       });
-      $display.find("[filter]").click(function (){
-        $display.find("[experiment_id]").hide();
+      $optimizely.find("[filter]").click(function (){
+        $optimizely.find("[experiment_id]").hide();
         let filter = $(this).attr("filter");
-        $display.find("#ooo_container_visitor > div > div").hide();
-        let $experiments = $displayExperiments.find("." + filter + "Experiment").show();
+        $optimizely.find("#ooo_container_visitor > div > div").hide();
+        let $experiments = $optimizelyExperiments.find("." + filter + "Experiment").show();
         if ($experiments.length){
           $alert.html("").css("display", "none");
         }else{
           $alert.css("display", "block").html("<h2> There are no " + (filter == "ooo" ? "" : filter) + " experiments to show :(");
         }
       });
-      $display.find("#view_people button").click(function (){
+      $optimizely.find("#view_people button").click(function (){
         let $this = $(this),
           t = $this.attr("show"),
-          r = $display.find("#" + t),
+          r = $optimizely.find("#" + t),
           i = r.is(":visible");
-        $display.find("#ooo_container_visitor .well").hide();
+        $optimizely.find("#ooo_container_visitor .well").hide();
         r.css("display", i ? "none" : "block");
-        $display.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
+        $optimizely.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
       });
-      $display.find("#show_my_variants").click(function (){
+      $optimizely.find("#show_my_variants").click(function (){
         let $this = $(this),
-          t = $display.find($this.attr("show")),
+          t = $optimizely.find($this.attr("show")),
           r = t.is(":visible");
         t.css("display", r ? "none" : "block");
-        $display.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
+        $optimizely.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
       });
+      return $optimizely;
     }
+
+    
     getExperimentId(id) {
       if (!id) return Object.keys(this.experiments);
       return !this.experiments[id] ? alert("Experiment #" + id + " not found.") : this.experiments[id];
@@ -305,161 +389,6 @@
     }
     htmlspecialchars(e) {
       return e.replace(/&/g, "&").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
-    static get styles(){
-      return `
-        :host{
-          font-size: 13px;
-        }
-
-        #opt_backdrop {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, .4);
-          z-index: 99999998
-        }
-        #opt_container {
-          position: fixed;
-          overflow-y: auto;
-          background: #FFF;
-          padding: 20px;
-          left: 50%;
-          top: 50%;
-          border-radius: 4px;
-          box-shadow: 0 0 28px -1px black;
-          -webkit-box-shadow: 0 0 28px -1px black;
-          min-width: 300px;
-          min-height: 300px;
-          z-index: 99999999;
-        }
-        .well .col {
-          width: 25%;
-          float: left;
-          text-align: center;
-        }
-        .center {
-          text-align: center;
-        }
-        code {
-          padding: 2px 4px;
-          font-size: 90%;
-          color: #c7254e;
-          background-color: #f9f2f4;
-          white-space: nowrap;
-          border-radius: 4px;
-        }
-        .container {
-          width: 100% !important;
-        }
-        b {
-          font-weight: bold !important;
-        }
-        label {
-          display: inline-block;
-          margin: 5px;
-          padding: 5px;
-          border-radius: 3px;
-          color: black;
-        }
-        .btn {
-          padding: 10px;
-          border-radius: 2px;
-          -webkit-border-radius: 2px;
-          cursor: pointer;
-          border: 1px solid transparent;
-        }
-        .btn-info,
-        .label-info {
-          background: #428bca;
-          border-color: #357ebd;
-        }
-        .btn-info:hover,
-        .label-info:hover {
-          background: #3276b1;
-          border-color: #285e8e;
-        }
-        .btn-success,
-        .label-success {
-          background: #5cb85c;
-          border-color: #4cae4c;
-        }
-        .btn-success:hover,
-        .label-success:hover {
-          background: #47a447;
-          border-color: #398439;
-        }
-        .btn-warning,
-        .label-warning {
-          background: #f0ad4e;
-          border-color: #eea236
-        }
-        .btn-warning:hover,
-        .label-warning:hover {
-          background: #ed9c28;
-          border-color: #d58512;
-        }
-        .btn-danger,
-        .label-danger {
-          background: #d9534f;
-          border-color#d43f3a;
-        }
-        .btn-danger:hover,
-        .label-danger:hover {
-          background: #d2322d;
-          border-color#ac2925;
-        }
-        .btn-primary,
-        .label-primary {
-          background: #428bca;
-          color: black !important;
-          border-color: #357ebd;
-        }
-        .btn-primary:hover,
-        .label-primary:hover {
-          background: #3276b1;
-          border-color#285e8e;
-        }
-        pre {
-          width: 95%;
-          overflow: hidden;
-          word-wrap: break-word;
-        }
-        .row {
-          width: 100%;
-          display: inline-block;
-          margin: 0;
-          padding: 5px;
-        }
-        .well {
-          background-color: #f5f5f5;
-          padding: 10px;
-          border: 1px solid #e3e3e3;
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
-          -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
-        }
-        .pull-right {
-          float: right
-        }
-        .pull-left {
-          float: left;
-        }
-        .closeme {
-          position: relative;
-          top: -7px;
-          right: -47%;
-          cursor: pointer;
-          font-size: 10px;
-          background: #FFF;
-          color: #35AFE3;
-          border-radius: 8px;
-          padding: 4px;
-        }
-        .segment {
-          float:none
-        }`;
     }
   }
   // Define the new element
