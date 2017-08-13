@@ -22,7 +22,6 @@
   transform: translate(-50%,-50%);
   border-radius: 4px;
   box-shadow: 0 0 28px -1px black;
-  min-height: 300px;
   width: calc(100% - 20px);
   box-sizing: border-box;
   max-height: 99%;
@@ -44,12 +43,37 @@ code {
   white-space: nowrap;
   border-radius: 4px;
 }
-label {
+label, .label {
   display: inline-block;
-  margin: 5px;
-  padding: 5px;
+  // margin: 5px;
+  padding: 10px;
   border-radius: 3px;
   color: black;
+  max-width: 200px;
+  box-sizing: border-box;
+
+  &.in{
+    font-style: italic;
+    font-weight: bold;
+  }
+  &:before{
+    display: inline-block;
+    margin-right: 5px;
+  }
+  &.active:before{
+    content: '►';
+    color: green;
+  }
+  &.paused:before{
+    content: '❚❚';
+    color: gray;
+  }
+  .shorten{
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 // fieldset{
 //   border: 1px solid gray;
@@ -141,8 +165,14 @@ $padding: 10px;
     }
   }
 
-  &.horizontal{
+  &#tabs{
     margin-top: 10px;
+    &>.tabs{
+      min-height: 300px;
+    }
+  }
+
+  &.horizontal{
     & > .links{
       & > li{
         display: inline-block;
@@ -203,6 +233,9 @@ $padding: 10px;
           background: #03a9f4;
         }
       }
+    }
+    @media (max-width: 768px){
+      display: block;
     }
   }
 

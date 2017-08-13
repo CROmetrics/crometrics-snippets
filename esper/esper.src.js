@@ -26,16 +26,29 @@
           this.optimizelyClassic = {
             accountId: window.optimizely.getAccountId(),
             revision: window.optimizely.revision,
-            state: data.state || {},
             audiences: data.audiences || {},
             variations: data.variations || {},
             experiments: data.experiments || {},
             segments: data.segments || {},
             visitor: data.visitor || {},
+            state: data.state || {}, //possibly unnecessary if we add it's info into the other objects in here
           };
+          for (let id in window.optimizely.variationMap){
+            let experiment = this.optimizelyClassic.experiments[id];
+            let variation_id = experiment.variation_ids[window.optimizely.variationMap[id]];
+            let variation = this.optimizelyClassic.variations[variation_id];
+            experiment.in = true;
+            variation.in = true;
+          }
+          for (let i in data.state.activeExperiments){
+            let id = data.state.activeExperiments[i];
+            let experiment = this.optimizelyClassic.experiments[id];
+            experiment.active = true;
+          }
         }
         if (window.optimizely.get){
           let data = window.optimizely.get('data');
+          let state = window.optimizely.get('state');
           this.optimizelyX = {
            accountId: data.accountId,
            revision: data.revision,
@@ -43,7 +56,24 @@
            variations: data.variations || {},
            experiments: data.experiments || {},
            campaigns: data.campaigns || {},
+           pages: data.pages || {},
+           events: data.events || {},
+           visitor: window.optimizely.get('visitor'),
+           state: state
           };
+          let activeExperiments = state.getActiveExperimentIds();
+          let campaignStates = state.getCampaignStates();
+
+          for (let i in activeExperiments){
+            let id = activeExperiments[i];
+            this.optimizelyX.experiments[id].active = true;
+          }
+          for (let id in campaignStates){
+            let campState = campaignStates[id];
+            let campaign = this.optimizelyX.campaigns[campState.id];
+            //There are some missing for some reason:
+            if (campaign) campaign.active = campaign.isActive;
+          }
         }
       }
 
@@ -119,15 +149,16 @@
 
     launch() {
       let $display = $(`<div id="ooo_container" class="container"></div>`).appendTo(this.$container);
-      this.$stats().appendTo($display);
+      $(`<h1 class="header center">${window.location.host}</h1>`).appendTo($display);
+      // this.$stats().appendTo($display);
 
       let tabs = [];
       if (this.optimizely){
+        if (this.optimizelyX){
+          tabs.push(['OptiX', this.$optimizelyX()]);
+        }
         if (this.optimizelyClassic){
           tabs.push(['OptiClassic', this.$optimizelyClassic()]);
-        }
-        if (this.optimizelyX){
-          tabs.push(['OptiX', this.$optimizelyClassic()]);
         }
       }
       if (this.dynamicYield){
@@ -139,15 +170,13 @@
       if (this.sentient){
         tabs.push(['Sentient', $(`<p>coming soon...</p>`)]);
       }
-      this.$makeTabs(tabs).addClass('horizontal').appendTo($display);
+      this.$makeTabs(tabs).addClass('horizontal').attr('id', 'tabs').appendTo($display);
     }
 
     $stats(){
-      let $section = $(`<h1 class="header center">${window.location.host}</h1>`);
       // let $section = $(
       // `<section class="container">
       //   <div class="well">
-      //     <h1 class="header center">${window.location.host}</h1>
       //     <div id="account_stats" class="row">
             
       //     </div>
@@ -175,49 +204,49 @@
 
     $optimizelyClassic(){
       let data = this.optimizelyClassic;
-      let tabs = [
-        ["Info", `<div class="col-3">
-          <dl class="box">
-            <dt>Account Owner</dt>
-            <dd>${data.accountId}</dd>
-          </dl>
-          <dl class="box">
-            <dt>Snippet Revision</dt>
-            <dd>${data.revision}</dd>
-          </dl>
-          <dl class="box">
-            <dt>Approx. Library Size</dt>
-            <dd>${(JSON.stringify(window.optimizely).length / 1e3).toFixed()} KB</dd>
-          </dl>
-          <dl class="box">
-            <dt>Classic Experiments</dt>
-            <dd>${Object.keys(data.experiments).length}</dd>
-          </dl>
-          <dl class="box">
-            <dt>Classic Variations</dt>
-            <dd>${Object.keys(data.variations).length}</dd>
-          </dl>
-          <dl class="box">
-            <dt>Classic Audiences</dt>
-            <dd>${Object.keys(data.audiences).length}</dd>
-          </dl>
-        </div>`]
-      ];
+      let tabs = [];
 
-      // tabs.push(['all experiments', this.renderAudiences()]);
-      // tabs.push(['live experiments', $(`<p>
-      //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
-      // </p>`)]);
-      // tabs.push(['paused experiments', $(`<p>
-      //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
-      // </p>`)]);
-      // tabs.push(['audiences', $(`<p>
-      //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
-      // </p>`)]);
+      tabs.push(["Info", 
+      `<div class="col-3">
+        <dl class="box">
+          <dt>Account Owner</dt>
+          <dd>${data.accountId}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Snippet Revision</dt>
+          <dd>${data.revision}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Approx. Library Size</dt>
+          <dd>${(JSON.stringify(window.optimizely).length / 1e3).toFixed()} KB</dd>
+        </dl>
+        <dl class="box">
+          <dt>Experiments</dt>
+          <dd>${Object.keys(data.experiments).length}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Variations</dt>
+          <dd>${Object.keys(data.variations).length}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Audiences</dt>
+          <dd>${Object.keys(data.audiences).length}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Your Dimensions</dt>
+          <dd>${Object.keys(data.visitor.dimensions).length}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Your Segments</dt>
+          <dd>${Object.keys(data.visitor.segments).length}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Your Audiences</dt>
+          <dd>${Object.keys(data.visitor.audiences).reduce((o,i)=>data.visitor.audiences[i]&&++o||o,0)}</dd>
+        </dl>
+      </div>`]);
+
       // tabs.push(['your segments', $(`<p>
-      //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
-      // </p>`)]);
-      // tabs.push(['all segments', $(`<p>
       //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
       // </p>`)]);
       // tabs.push(['my experience', $(`<p>
@@ -227,17 +256,29 @@
       let experiments = '', live = 0, paused = 0;
       for (let i in data.experiments){
         let item = data.experiments[i];
-        experiments += `<label class="segment col-sm-5 label">${item.name}</label>`;
+        experiments += `<label class="${item.in?'in':'out'} ${item.in?'active':'paused'}">${item.name}</label>`;
       }
       tabs.push(['Experiments', `
         <h2>Experiments:</h2><hr>
         ${experiments || '<label class="badge badge-danger">There are no Experiments.</label>'}
       `]);
+      
+      let variations = '';
+      for (let i in data.variations){
+        let item = data.variations[i];
+        variations += `<label class="${item.in?'in':'out'}">${item.name}</label>`;
+      }
+      tabs.push(['Variations', `
+        <h2>Variations:</h2><hr>
+        ${variations || '<label class="badge badge-danger">There are no Variations.</label>'}
+      `]);
 
       let audiences = '';
       for (let i in data.audiences){
         let item = data.audiences[i];
-        audiences += `<label class="segment col-sm-5 label">${item.name}</label>`;
+        // let inSegment = data.visitor && data.visitor.audiences[item.audience_id]?'in':'out';
+        // console.log(inSegment, data.visitor.audiences, item);
+        audiences += `<label class="">${item.name}</label>`;
       }
       tabs.push(['Audiences', `
         <h2>Audiences:</h2><hr>
@@ -247,11 +288,132 @@
       let segments = '';
       for (let i in data.segments){
         let item = data.segments[i];
-        segments += `<label class="segment col-sm-5 label">${item.name}</label>`;
+        segments += `<label class="">${item.name}</label>`;
       }
       tabs.push(['Segments', `
         <h2>Segments:</h2><hr>
         ${segments || '<label class="badge badge-danger">There are no Segments.</label>'}
+      `]);
+
+      return this.$makeTabs(tabs).addClass('vertical');
+    }
+
+    $optimizelyX(){
+      let data = this.optimizelyX;
+      let tabs = [];
+
+      tabs.push(["Info", 
+      `<div class="col-3">
+        <dl class="box">
+          <dt>Account Owner</dt>
+          <dd>${data.accountId}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Snippet Revision</dt>
+          <dd>${data.revision}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Approx. Library Size</dt>
+          <dd>${(JSON.stringify(window.optimizely).length / 1e3).toFixed()} KB</dd>
+        </dl>
+        <dl class="box">
+          <dt>Pages</dt>
+          <dd>${Object.keys(data.pages).length}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Events</dt>
+          <dd>${Object.keys(data.events).length}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Campaigns</dt>
+          <dd>${Object.keys(data.campaigns).length}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Experiments</dt>
+          <dd>${Object.keys(data.experiments).length}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Variations</dt>
+          <dd>${Object.keys(data.variations).length}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Audiences</dt>
+          <dd>${Object.keys(data.audiences).length}</dd>
+        </dl>
+        <dl class="box">
+          <dt>Your Attributes</dt>
+          <dd>${Object.keys(data.visitor.custom).reduce((o,i)=>data.visitor.custom[i]&&++o||o,0)}</dd>
+        </dl>
+      </div>`]);
+
+      // tabs.push(['your segments', $(`<p>
+      //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
+      // </p>`)]);
+      // tabs.push(['my experience', $(`<p>
+      //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
+      // </p>`)]);
+
+      let pages = '';
+      for (let i in data.pages){
+        let item = data.pages[i];
+        pages += `<label class="" title="${item.apiName}"><span class="shorten">${item.apiName}</span><br><b>id: ${item.id}</b></label>`;
+      }
+      tabs.push(['Pages', `
+        <h2>Pages:</h2><hr>
+        ${pages || '<label class="badge badge-danger">There are no Pages.</label>'}
+      `]);
+      
+      let events = '';
+      for (let i in data.events){
+        let item = data.events[i];
+        events += `<label class="">${item.id}</label>`;
+      }
+      tabs.push(['Events', `
+        <h2>Events:</h2><hr>
+        ${events || '<label class="badge badge-danger">There are no Events.</label>'}
+      `]);
+
+      let campaigns = '';
+      for (let i in data.campaigns){
+        let item = data.campaigns[i];
+        campaigns += `<label class="${item.in?'in':'out'} ${item.in?'active':'paused'}">${item.id}</label>`;
+      }
+      tabs.push(['Campaigns', `
+        <h2>Campaigns:</h2><hr>
+        ${campaigns || '<label class="badge badge-danger">There are no Campaigns.</label>'}
+      `]);
+
+      let experiments = '';
+      for (let i in data.experiments){
+        let item = data.experiments[i];
+        experiments += `<label class="${item.in?'in':'out'} ${item.in?'active':'paused'}">${item.id}</label>`;
+      }
+      tabs.push(['Experiments', `
+        <h2>Experiments:</h2><hr>
+        ${experiments || '<label class="badge badge-danger">There are no Experiments.</label>'}
+      `]);
+      
+      let variations = '';
+      for (let i in data.variations){
+        let item = data.variations[i];
+        variations += `<label class="${item.in?'in':'out'}">${item.id}</label>`;
+      }
+      tabs.push(['Variations', `
+        <h2>Variations:</h2><hr>
+        ${variations || '<label class="badge badge-danger">There are no Variations.</label>'}
+      `]);
+
+      let audiences = '';
+      console.log(data.audiences);
+      for (let i in data.audiences){
+        let item = data.audiences[i];
+        // let inSegment = data.visitor && data.visitor.audiences[item.audience_id]?'in':'out';
+        // console.log(inSegment, data.visitor.audiences, item);
+        audiences += `<label class="">${item.id}</label>`;
+      }
+      tabs.push(['Audiences', `
+        <h2>Audiences:</h2><hr>
+        ${audiences || '<label class="badge badge-danger">There are no Audiences.</label>'}
       `]);
 
       return this.$makeTabs(tabs).addClass('vertical');
@@ -385,118 +547,118 @@
 
 
     
-    getExperimentId(id) {
-      if (!id) return Object.keys(this.experiments);
-      return !this.experiments[id] ? alert("Experiment #" + id + " not found.") : this.experiments[id];
-    }
-    getExperimentName(id) {
-      return this.isExperiment(id) ? this.experiments[id].name : false;
-    }
-    addExperiment(id) {
-      let experiment = this.experiments[id] || {},
-        variations = experiment.variation_ids || {},
-        varCount = Object.keys(variations).length,
-        active = ~$.inArray(id, this.state.activeExperiments);
+    // getExperimentId(id) {
+    //   if (!id) return Object.keys(this.experiments);
+    //   return !this.experiments[id] ? alert("Experiment #" + id + " not found.") : this.experiments[id];
+    // }
+    // getExperimentName(id) {
+    //   return this.isExperiment(id) ? this.experiments[id].name : false;
+    // }
+    // addExperiment(id) {
+    //   let experiment = this.experiments[id] || {},
+    //     variations = experiment.variation_ids || {},
+    //     varCount = Object.keys(variations).length,
+    //     active = ~$.inArray(id, this.state.activeExperiments);
       
-      let variationsLabel = `${experiment.section_ids.length ? `MVT (${experiment.section_ids.length} Elements)` : "A/B/n"} | ${varCount} Variations`;
-      let statusLabel = active ? `<label style="font-size:100%;" class="label label-success label-large show_variations">LIVE</label>`:`<label style="font-size:100%;" class="label label-grey">Not Running</label>`;
-      let $experiment = $(`<div experiment_id="${id}" class="row ${active?" liveExperiment":" pausedExperiment"} allExperiment">
-        <i class="icon-plus"></i>
-         <h3><a class="experiment_name">${this.getExperimentName(id)}</a></h3>&emsp;
-         <code class="show_variations">Experiment ID: ${id}</code>&emsp;
-         <code class="show_variations">${variationsLabel}</code>&emsp;
-         ${statusLabel}&emsp;
-         ${(varCount ? `<button class="show_variations btn btn-danger">View Variations</button>`: "")} &emsp;
-         ${(experiment.manual ? `<label class="label label-warning">Manually Activated</label>`: "")}
-         ${(experiment.code ? `&emsp;<button class="show_code btn btn-small btn-info">View Script</button><pre class="pre-scrollable script_display" style="display:none;">${this.htmlspecialchars(experiment.code)}</pre>` : "")}
-         <section style="display:none;" class="variation_section container"></section>
-      </div>`);
-      let $variationsSection = $experiment.find(".variation_section").append(this.renderVariationsSection(id));
-      $experiment.find(".show_variations").click(function (){
-        $variationsSection.toggle();
-        $experiment.find("button.show_variations").text($variationsSection.is(":visible") ? "Hide Variations" : "View Variations");
-      });
-      $experiment.find(".show_code").click(function (){
-        let $this = $(this), $code = $this.parent().find("pre");
-        $code.toggle();
-        $this.text($code.is(":visible") ? "Hide Script" : "View Script");
-      });
-      return $experiment;
-    }
-    renderYourSegments() {
-      if (!this.visitor.segments) return "<h2 class='center'><label class='badge badge-danger'>You are not part of any segments!</label></h2>";
-      let r = this.visitor.segments,
-        i = 0,
-        s = "<h2>Here are the segments you are part of: </h2><br><br>";
-      $.each(r, (n, r)=>{
-        if (!this.segments[n]) return;
-        s += "<label class='segment col-sm-5 label label-" + COLORS[i] + "'>" + this.segments[n].name + " = " + r + "</label>";
-        i = i == 3 ? 0 : i + 1;
-      });
-      return s;
-    }
-    renderAllSegments() {
-      if (!this.segments) return "<h2 class='center'><label class='badge badge-danger'>There are no segments created.</label></h2>";
-      let r = "<h2>Here are all segments being targeted towards on this site: </h2><hr>",
-        i = 0;
-      $.each(this.segments, (n, s)=>{
-        r += "<label class='segment col-sm-5 label label-" + COLORS[i] + "'>" + this.segments[n].name + "</label>";
-        i = i == 3 ? 0 : i + 1;
-      });
-      return r;
-    }
-    renderMyVariants() {
-      let t = window.optimizely.variationNamesMap || {},
-        r = 0,
-        i = "<h2>Here are the tests and variations you are currently a part of!</h2>";
-      if (!t || !Object.keys(t).length) return "<h2 class='center'><label class='badge badge-danger'>You are not in any experiments! Shame...</label></h2>";
-      $.each(t, (t, n)=>{
-        i += "<label class='segment col-sm-12 label label-" + COLORS[r] + "' style='width:90%;left:5%;'>&emsp;" + this.experiments[t].name + " - &emsp;<code>" + n + "</code></label>";
-        r = r == 3 ? 0 : r + 1;
-      });
-      return i;
-    }
-    renderAudiences() {
-      if (!this.audiences) return "<h2 class='center'><label badge badge-danger'>There are no audiences created.</label></h2>";
-      let r = 0,
-        i = "<h2>Here are all audiences being observed in analytics on this site: </h2><hr>";
-      $.each(this.audiences, (t, n)=>{
-        i += "<label class='segment col-sm-5 label label-" + COLORS[r] + "'>" + n.name + "</label>";
-        r = r == 3 ? 0 : r + 1;
-      });
-      return i;
-    }
-    renderVariationsSection(eId) { //was render_experiment_page
-      let experiment = this.experiments[eId];
-      let $variations = $("<div/>");
-      $.each(experiment.variation_ids, (index, vId)=>{
-        let name = this.variations[vId].name;
-        let code =  this.variations[vId].code;
-        let previewLink = (()=>{
-          let link = location.href;
-          link += (link.split("?")[1] ? "&" : "?") + "optimizely_x" + eId + "=" + index;
-          return `<a href="${link}" class="pull-right btn btn-primary" target="_blank">Preview Variation</a>`;
-        })();
-        let $variation = $(`
-          <div class="row oooExperiment_variation" variation_id="${vId}">
-            <div class="col-sm-3">
-              <h3>${name} ${previewLink}</h3>
-            </div>
-            <div class="col-sm-9">
-              <pre class="col-sm-12">${(code ? this.htmlspecialchars(code) : "Empty Variant Code")}</pre>
-            </div>
-          </div>
-        `);
-        $variations.append($variation).append("<hr>");
-      });
-      return $variations;
-    }
-    isExperiment(e) {
-      return !!this.experiments[e];
-    }
-    isVariation(e) {
-      return !!this.variations[e];
-    }
+    //   let variationsLabel = `${experiment.section_ids.length ? `MVT (${experiment.section_ids.length} Elements)` : "A/B/n"} | ${varCount} Variations`;
+    //   let statusLabel = active ? `<label style="font-size:100%;" class="label label-success label-large show_variations">LIVE</label>`:`<label style="font-size:100%;" class="label label-grey">Not Running</label>`;
+    //   let $experiment = $(`<div experiment_id="${id}" class="row ${active?" liveExperiment":" pausedExperiment"} allExperiment">
+    //     <i class="icon-plus"></i>
+    //      <h3><a class="experiment_name">${this.getExperimentName(id)}</a></h3>&emsp;
+    //      <code class="show_variations">Experiment ID: ${id}</code>&emsp;
+    //      <code class="show_variations">${variationsLabel}</code>&emsp;
+    //      ${statusLabel}&emsp;
+    //      ${(varCount ? `<button class="show_variations btn btn-danger">View Variations</button>`: "")} &emsp;
+    //      ${(experiment.manual ? `<label class="label label-warning">Manually Activated</label>`: "")}
+    //      ${(experiment.code ? `&emsp;<button class="show_code btn btn-small btn-info">View Script</button><pre class="pre-scrollable script_display" style="display:none;">${this.htmlspecialchars(experiment.code)}</pre>` : "")}
+    //      <section style="display:none;" class="variation_section container"></section>
+    //   </div>`);
+    //   let $variationsSection = $experiment.find(".variation_section").append(this.renderVariationsSection(id));
+    //   $experiment.find(".show_variations").click(function (){
+    //     $variationsSection.toggle();
+    //     $experiment.find("button.show_variations").text($variationsSection.is(":visible") ? "Hide Variations" : "View Variations");
+    //   });
+    //   $experiment.find(".show_code").click(function (){
+    //     let $this = $(this), $code = $this.parent().find("pre");
+    //     $code.toggle();
+    //     $this.text($code.is(":visible") ? "Hide Script" : "View Script");
+    //   });
+    //   return $experiment;
+    // }
+    // renderYourSegments() {
+    //   if (!this.visitor.segments) return "<h2 class='center'><label class='badge badge-danger'>You are not part of any segments!</label></h2>";
+    //   let r = this.visitor.segments,
+    //     i = 0,
+    //     s = "<h2>Here are the segments you are part of: </h2><br><br>";
+    //   $.each(r, (n, r)=>{
+    //     if (!this.segments[n]) return;
+    //     s += "<label class='segment label label-" + COLORS[i] + "'>" + this.segments[n].name + " = " + r + "</label>";
+    //     i = i == 3 ? 0 : i + 1;
+    //   });
+    //   return s;
+    // }
+    // renderAllSegments() {
+    //   if (!this.segments) return "<h2 class='center'><label class='badge badge-danger'>There are no segments created.</label></h2>";
+    //   let r = "<h2>Here are all segments being targeted towards on this site: </h2><hr>",
+    //     i = 0;
+    //   $.each(this.segments, (n, s)=>{
+    //     r += "<label class='segment label label-" + COLORS[i] + "'>" + this.segments[n].name + "</label>";
+    //     i = i == 3 ? 0 : i + 1;
+    //   });
+    //   return r;
+    // }
+    // renderMyVariants() {
+    //   let t = window.optimizely.variationNamesMap || {},
+    //     r = 0,
+    //     i = "<h2>Here are the tests and variations you are currently a part of!</h2>";
+    //   if (!t || !Object.keys(t).length) return "<h2 class='center'><label class='badge badge-danger'>You are not in any experiments! Shame...</label></h2>";
+    //   $.each(t, (t, n)=>{
+    //     i += "<label class='segment col-sm-12 label label-" + COLORS[r] + "' style='width:90%;left:5%;'>&emsp;" + this.experiments[t].name + " - &emsp;<code>" + n + "</code></label>";
+    //     r = r == 3 ? 0 : r + 1;
+    //   });
+    //   return i;
+    // }
+    // renderAudiences() {
+    //   if (!this.audiences) return "<h2 class='center'><label badge badge-danger'>There are no audiences created.</label></h2>";
+    //   let r = 0,
+    //     i = "<h2>Here are all audiences being observed in analytics on this site: </h2><hr>";
+    //   $.each(this.audiences, (t, n)=>{
+    //     i += "<label class='segment label label-" + COLORS[r] + "'>" + n.name + "</label>";
+    //     r = r == 3 ? 0 : r + 1;
+    //   });
+    //   return i;
+    // }
+    // renderVariationsSection(eId) { //was render_experiment_page
+    //   let experiment = this.experiments[eId];
+    //   let $variations = $("<div/>");
+    //   $.each(experiment.variation_ids, (index, vId)=>{
+    //     let name = this.variations[vId].name;
+    //     let code =  this.variations[vId].code;
+    //     let previewLink = (()=>{
+    //       let link = location.href;
+    //       link += (link.split("?")[1] ? "&" : "?") + "optimizely_x" + eId + "=" + index;
+    //       return `<a href="${link}" class="pull-right btn btn-primary" target="_blank">Preview Variation</a>`;
+    //     })();
+    //     let $variation = $(`
+    //       <div class="row oooExperiment_variation" variation_id="${vId}">
+    //         <div class="col-sm-3">
+    //           <h3>${name} ${previewLink}</h3>
+    //         </div>
+    //         <div class="col-sm-9">
+    //           <pre class="col-sm-12">${(code ? this.htmlspecialchars(code) : "Empty Variant Code")}</pre>
+    //         </div>
+    //       </div>
+    //     `);
+    //     $variations.append($variation).append("<hr>");
+    //   });
+    //   return $variations;
+    // }
+    // isExperiment(e) {
+    //   return !!this.experiments[e];
+    // }
+    // isVariation(e) {
+    //   return !!this.variations[e];
+    // }
     htmlspecialchars(e) {
       return e.replace(/&/g, "&").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
