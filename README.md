@@ -21,7 +21,11 @@ This opens a panel which displays information about the optimizely snippet runni
 
 ***Usage:*** Run the bookmarklet on a site that has optimizely running.
 
-***Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/esper/esper.min.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>.***
+***Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/esper/esper.min.js').then(r=>r.text()).then(t=>new Function(t)())">ESPER</a> bookmarklet.***
+
+Legacy version (soon to be phased out):
+***Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/esper/esper.old.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>.***
+
 
 Bookmarklet originally based on: https://gist.github.com/danest/73eda651cd4fb4ec76fb/
 

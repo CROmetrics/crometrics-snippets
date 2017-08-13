@@ -130,19 +130,23 @@
       let $section = $(`<div class="tab-section">`);
       let $links = $(`<ul class="links">`).appendTo($section);
       let $tabs = $(`<div class="tabs">`).appendTo($section);
-      let tabCount = 0;
-      for (let t in tabs){
-        let [label, $content] = tabs[t];
-        // let key = label.replace(/[^\w]/g, '');
-        let $tab = $(`<div class="tab"></div>`).append($content).appendTo($tabs);
-        let $link = $(`<a href="#">${label}</a>`).appendTo($links).click(e=>{
-          e.preventDefault();
-          $tabs.find('> .active').removeClass('active');
-          $tab.addClass('active');
-          $links.find('> li > .active').removeClass('active');
-          $link.addClass('active');
-        }).wrap('<li>');
-        if (!(tabCount++)) $tab.add($link).addClass('active');
+      if (tabs.length){
+        let tabCount = 0;
+        for (let t in tabs){
+          let [label, $content] = tabs[t];
+          // let key = label.replace(/[^\w]/g, '');
+          let $tab = $(`<div class="tab"></div>`).append($content).appendTo($tabs);
+          let $link = $(`<a href="#">${label}</a>`).appendTo($links).click(e=>{
+            e.preventDefault();
+            $tabs.find('> .active').removeClass('active');
+            $tab.addClass('active');
+            $links.find('> li > .active').removeClass('active');
+            $link.addClass('active');
+          }).wrap('<li>');
+          if (!(tabCount++)) $tab.add($link).addClass('active');
+        }
+      }else{
+        $tabs.html('Nothing found.');
       }
       return $section;
     }
@@ -259,7 +263,7 @@
         experiments += `<label class="${item.in?'in':'out'} ${item.in?'active':'paused'}">${item.name}</label>`;
       }
       tabs.push(['Experiments', `
-        <h2>Experiments:</h2><hr>
+        <h2>Experiments:</h2>
         ${experiments || '<label class="badge badge-danger">There are no Experiments.</label>'}
       `]);
       
@@ -269,7 +273,7 @@
         variations += `<label class="${item.in?'in':'out'}">${item.name}</label>`;
       }
       tabs.push(['Variations', `
-        <h2>Variations:</h2><hr>
+        <h2>Variations:</h2>
         ${variations || '<label class="badge badge-danger">There are no Variations.</label>'}
       `]);
 
@@ -281,7 +285,7 @@
         audiences += `<label class="">${item.name}</label>`;
       }
       tabs.push(['Audiences', `
-        <h2>Audiences:</h2><hr>
+        <h2>Audiences:</h2>
         ${audiences || '<label class="badge badge-danger">There are no Audiences.</label>'}
       `]);
 
@@ -291,7 +295,7 @@
         segments += `<label class="">${item.name}</label>`;
       }
       tabs.push(['Segments', `
-        <h2>Segments:</h2><hr>
+        <h2>Segments:</h2>
         ${segments || '<label class="badge badge-danger">There are no Segments.</label>'}
       `]);
 
@@ -359,7 +363,7 @@
         pages += `<label class="" title="${item.apiName}"><span class="shorten">${item.apiName}</span><br><b>id: ${item.id}</b></label>`;
       }
       tabs.push(['Pages', `
-        <h2>Pages:</h2><hr>
+        <h2>Pages:</h2>
         ${pages || '<label class="badge badge-danger">There are no Pages.</label>'}
       `]);
       
@@ -369,7 +373,7 @@
         events += `<label class="">${item.id}</label>`;
       }
       tabs.push(['Events', `
-        <h2>Events:</h2><hr>
+        <h2>Events:</h2>
         ${events || '<label class="badge badge-danger">There are no Events.</label>'}
       `]);
 
@@ -379,7 +383,7 @@
         campaigns += `<label class="${item.in?'in':'out'} ${item.in?'active':'paused'}">${item.id}</label>`;
       }
       tabs.push(['Campaigns', `
-        <h2>Campaigns:</h2><hr>
+        <h2>Campaigns:</h2>
         ${campaigns || '<label class="badge badge-danger">There are no Campaigns.</label>'}
       `]);
 
@@ -389,7 +393,7 @@
         experiments += `<label class="${item.in?'in':'out'} ${item.in?'active':'paused'}">${item.id}</label>`;
       }
       tabs.push(['Experiments', `
-        <h2>Experiments:</h2><hr>
+        <h2>Experiments:</h2>
         ${experiments || '<label class="badge badge-danger">There are no Experiments.</label>'}
       `]);
       
@@ -399,7 +403,7 @@
         variations += `<label class="${item.in?'in':'out'}">${item.id}</label>`;
       }
       tabs.push(['Variations', `
-        <h2>Variations:</h2><hr>
+        <h2>Variations:</h2>
         ${variations || '<label class="badge badge-danger">There are no Variations.</label>'}
       `]);
 
@@ -412,7 +416,7 @@
         audiences += `<label class="">${item.id}</label>`;
       }
       tabs.push(['Audiences', `
-        <h2>Audiences:</h2><hr>
+        <h2>Audiences:</h2>
         ${audiences || '<label class="badge badge-danger">There are no Audiences.</label>'}
       `]);
 
@@ -599,7 +603,7 @@
     // }
     // renderAllSegments() {
     //   if (!this.segments) return "<h2 class='center'><label class='badge badge-danger'>There are no segments created.</label></h2>";
-    //   let r = "<h2>Here are all segments being targeted towards on this site: </h2><hr>",
+    //   let r = "<h2>Here are all segments being targeted towards on this site: </h2>",
     //     i = 0;
     //   $.each(this.segments, (n, s)=>{
     //     r += "<label class='segment label label-" + COLORS[i] + "'>" + this.segments[n].name + "</label>";
@@ -621,7 +625,7 @@
     // renderAudiences() {
     //   if (!this.audiences) return "<h2 class='center'><label badge badge-danger'>There are no audiences created.</label></h2>";
     //   let r = 0,
-    //     i = "<h2>Here are all audiences being observed in analytics on this site: </h2><hr>";
+    //     i = "<h2>Here are all audiences being observed in analytics on this site: </h2>";
     //   $.each(this.audiences, (t, n)=>{
     //     i += "<label class='segment label label-" + COLORS[r] + "'>" + n.name + "</label>";
     //     r = r == 3 ? 0 : r + 1;
