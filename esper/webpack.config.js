@@ -16,6 +16,15 @@ module.exports = {
           'css-loader'
         ]
       },
+      {
+        test: /\.scss$/,
+        use: [
+          // "style-loader",
+          'to-string-loader',
+          "css-loader",
+          "sass-loader" // compiles Sass to CSS
+        ]
+      }
     ]
   },
   watchOptions: {

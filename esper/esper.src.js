@@ -22,9 +22,10 @@
       if (window.optimizely){
         this.optimizely = {};
         if (window.optimizely.data && !window.optimizely.data.note){
-          this.optimizely.accountId = window.optimizely.getAccountId();
-          this.optimizely.revision = window.optimizely.revision;
-          this.optimizely.classic = {
+          let data = window.optimizely.data;
+          this.optimizelyClassic = {
+            accountId: window.optimizely.getAccountId(),
+            revision: window.optimizely.revision,
             state: data.state || {},
             audiences: data.audiences || {},
             variations: data.variations || {},
@@ -35,9 +36,9 @@
         }
         if (window.optimizely.get){
           let data = window.optimizely.get('data');
-          this.optimizely.accountId = data.accountId;
-          this.optimizely.revision = data.revision;
-          this.optimizely.X = {
+          this.optimizelyX = {
+           accountId: data.accountId,
+           revision: data.revision,
            audiences: data.audiences || {},
            variations: data.variations || {},
            experiments: data.experiments || {},
@@ -46,29 +47,30 @@
         }
       }
 
-      // let data = window.optimizely.data || {};
-      // let xData = window.optimizely.get && window.optimizely.get('data') || {};
+      if (window.DYO){
+        this.dynamicYield = {
+          experiments: window.DYO.oexps || {}
+        };
+      }
 
-      // this.X = !!window.optimizely.get;
-      // this.C = !!window.optimizely.getAccountId;
-      // this.state = data.state || {};
-      // this.audiences = data.audiences || {};
-      // this.xAudiences = xData.audiences || {};
-      // this.variations = data.variations || {};
-      // this.xVariations = xData.variations || {};
-      // this.experiments = data.experiments || {};
-      // this.xExperiments = xData.experiments || {};
-      // this.xCampaigns = xData.campaigns || {};
-      // this.segments = data.segments || {};
-      // this.visitor = data.visitor || {};
-      // this.accountId = xData.accountId || window.optimizely.getAccountId();
-      // this.revision = optimizely.revision || xData.revision;
+      if (window.monetate){
+        this.monetate = {
+          // experiments: window.monetate || {}
+        };
+      }
+
+      if (window.SentientAscend){
+        this.sentient = {
+          // experiments: window.SentientAscend || {}
+        };
+      }
+
     }
 
     connectedCallback(){
       let shadow = this.attachShadow({mode: 'closed'});
       let stylesheet = document.createElement('style');
-      stylesheet.innerHTML = require("./esper.css");
+      stylesheet.innerHTML = require("./esper.scss");
 
       // $("#opt_container,#opt_styles,#opt_backdrop").remove();
       this.$container = $("<div id='opt_container'/>");
@@ -93,186 +95,294 @@
     attributeChangedCallback() {
 
     }
+    
+    $makeTabs(tabs){
+      let $section = $(`<div class="tab-section">`);
+      let $links = $(`<ul class="links">`).appendTo($section);
+      let $tabs = $(`<div class="tabs">`).appendTo($section);
+      let tabCount = 0;
+      for (let t in tabs){
+        let [label, $content] = tabs[t];
+        // let key = label.replace(/[^\w]/g, '');
+        let $tab = $(`<div class="tab"></div>`).append($content).appendTo($tabs);
+        let $link = $(`<a href="#">${label}</a>`).appendTo($links).click(e=>{
+          e.preventDefault();
+          $tabs.find('> .active').removeClass('active');
+          $tab.addClass('active');
+          $links.find('> li > .active').removeClass('active');
+          $link.addClass('active');
+        }).wrap('<li>');
+        if (!(tabCount++)) $tab.add($link).addClass('active');
+      }
+      return $section;
+    }
 
     launch() {
       let $display = $(`<div id="ooo_container" class="container"></div>`).appendTo(this.$container);
       this.$stats().appendTo($display);
 
-      let $tabs = $(`<div id="tabs">`).appendTo($display);
-      let $links = $(`<ul class="links">`).appendTo($tabs);
-
-      $tabs.append(`<div id="tabs-1">
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil molestiae soluta praesentium rerum accusantium commodi necessitatibus porro omnis, ipsum aspernatur, corporis unde reiciendis quas dolor quae? Tenetur aut quia rerum.</p>
-          </div>`);
-      $links.append(`<li><a href="#tabs-1">tab1</a></li>`);
-
-      $tabs.append(`<div id="tabs-2">
-            <p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-          </div>`);
-      $links.append(`<li><a href="#tabs-2">tab2</a></li>`);
-
-      // if (this.optimizely){
-      //   if (this.optimizely.classic){
-      //     this.$optimizely().appendTo($display);
-      //   }
-      // }
+      let tabs = [];
+      if (this.optimizely){
+        if (this.optimizelyClassic){
+          tabs.push(['OptiClassic', this.$optimizelyClassic()]);
+        }
+        if (this.optimizelyX){
+          tabs.push(['OptiX', this.$optimizelyClassic()]);
+        }
+      }
+      if (this.dynamicYield){
+        tabs.push(['Dynamic Yield', $(`<p>coming soon...</p>`)]);
+      }
+      if (this.monetate){
+        tabs.push(['Monetate', $(`<p>coming soon...</p>`)]);
+      }
+      if (this.sentient){
+        tabs.push(['Sentient', $(`<p>coming soon...</p>`)]);
+      }
+      this.$makeTabs(tabs).addClass('horizontal').appendTo($display);
     }
 
     $stats(){
-      let $section = $(
-      `<section class="container">
-        <div class="well">
-          <h1 class="header center">${window.location.host}</h1>
-          <div id="account_stats" class="row">
+      let $section = $(`<h1 class="header center">${window.location.host}</h1>`);
+      // let $section = $(
+      // `<section class="container">
+      //   <div class="well">
+      //     <h1 class="header center">${window.location.host}</h1>
+      //     <div id="account_stats" class="row">
             
-          </div>
-        </div>
-      </section>`);
-      let $info = $section.find('#account_stats');
-      if (this.optimizely){
-        let hasX = this.optimizely && this.optimizely.X, hasClassic = this.optimizely && this.optimizely.classic;
-        $info.append(
-        `<div class="col">
-          <div>${hasX?'OptX(✔)':'OptX(✗)'}</div><div>${hasClassic?'Classic(✔)':'Classic(✗)'}</div>
-        </div>`);
-        // <div class="col">
-        //   <u>Account Owner</u><br><span>${this.accountId}</span>
-        // </div>
-        // <div class="col">
-        //   <u>Snippet Revision</u><br><span>${this.revision}</span>
-        // </div>
-        // <div class="col">
-        //   <u>Approx. Library Size</u><br><span>${(JSON.stringify(window.optimizely).length / 1e3).toFixed()} KB</span>
-        // </div>
-      }
+      //     </div>
+      //   </div>
+      // </section>`);
+      // let $info = $section.find('#account_stats');
+      // if (this.optimizely){
+      //   let hasX = this.optimizely && this.optimizelyX, hasClassic = this.optimizely && this.optimizelyClassic;
+      //   $info.append(
+      //   `<div class="col">
+      //     <div>${hasX?'OptX(✔)':'OptX(✗)'}</div><div>${hasClassic?'Classic(✔)':'Classic(✗)'}</div>
+      //   </div>`);
+      //   // <div class="col">
+      //   //   <u>Account Owner</u><br><span>${this.accountId}</span>
+      //   // </div>
+      //   // <div class="col">
+      //   //   <u>Snippet Revision</u><br><span>${this.revision}</span>
+      //   // </div>
+      //   // <div class="col">
+      //   //   <u>Approx. Library Size</u><br><span>${(JSON.stringify(window.optimizely).length / 1e3).toFixed()} KB</span>
+      //   // </div>
+      // }
       return $section;
     }
 
     $optimizelyClassic(){
-      let $optimizely = $(`
-        <div class="optimizely">
-          <section id="ooo_container_visitors" class="container">
-            <div class="well"><br>
-              <h1 class="header center">This Site: <b>${window.location.host}</b></h1>
-              <div id='account_stats' class="row">
-                <div class="col">
-                  <div>${this.X?'OptX(✔)':'OptX(✗)'}</div><div>${this.C?'Classic(✔)':'Classic(✗)'}</div>
-                </div>
-                <div class="col">
-                  <u>Account Owner</u><br><span>${this.accountId}</span>
-                </div>
-                <div class="col">
-                  <u>Snippet Revision</u><br><span>${this.revision}</span>
-                </div>
-                <div class="col">
-                  <u>Approx. Library Size</u><br><span>${(JSON.stringify(window.optimizely).length / 1e3).toFixed()} KB</span>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <u>X Experiments</u><br><span>${Object.keys(this.xExperiments).length}</span>
-                </div>
-                <div class="col">
-                  <u>X Variations</u><br><span>${Object.keys(this.xVariations).length}</span>
-                </div>
-                <div class="col">
-                  <u>X Audiences</u><br><span>${Object.keys(this.xAudiences).length}</span>
-                </div>
-                <div class="col">
-                  <u>X Campaigns</u><br><span>${Object.keys(this.xCampaigns).length}</span>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <u>Classic Experiments</u><br><span>${Object.keys(this.experiments).length}</span>
-                </div>
-                <div class="col">
-                  <u>Classic Variations</u><br><span>${Object.keys(this.variations).length}</span>
-                </div>
-                <div class="col">
-                  <u>Classic Audiences</u><br><span>${Object.keys(this.audiences).length}</span>
-                </div>
-              </div>
-            </div><br>
-            <div id="ooo_filters" class="row center">
-              <div class="btn-group" data-toggle="buttons">
-                <span style="font-weight:bolder;font-size:16px;">Experiment Status:&emsp;</span>
-                <button class="btn info btn-info" filter="all">ALL EXPERIMENTS</button>
-                <button class="btn info btn-info" filter="live">LIVE EXPERIMENTS</button>
-                <button class="btn info btn-info" filter="paused">PAUSED EXPERIMENTS</button>
-              </div><br>
-              <div id="view_people" class="btn-group" data-toggle="button">
-                <span style="font-weight:bolder;font-size:16px;">Browse Visitor Criteria:&emsp;</span>
-                <button class="btn btn-warning" show="ooo_audiences" id="view_audiences">AUDIENCES</button>
-                <button class="btn btn-warning" show="ooo_visitor_you" id="view_visitor_you">YOUR SEGMENTS</button>
-                <button class="btn btn-warning" show="ooo_visitor_all" id="view_visitor_all">ALL SEGMENTS</button>
-                <button class="btn btn-warning btn-lg" show="my_variants" id="show_my_variants">MY EXPERIENCE</button>
-              </div>
-              <hr>
-              <section id="ooo_container_visitor" class="container">
-                <div class="row-fluid">
-                  <div style="display:none;" id="ooo_audiences" class="well blue col-xs-12">
-                    <a class="closeme">CLOSE</a> ${this.renderAudiences()}
-                  </div>
-                  <div style="display:none;" id="ooo_visitor_you" class="well blue col-xs-12">
-                    <a class="closeme">CLOSE</a> ${this.renderYourSegments()}
-                  </div>
-                  <div style="display:none;" id="ooo_visitor_all" class="well blue col-xs-12">
-                    <a class="closeme">CLOSE</a> ${this.renderAllSegments()}
-                  </div>
-                  <div id="my_variants" class="center well alert alert-info" style="display:none">
-                    <a class="closeme">CLOSE</a> ${this.renderMyVariants()}
-                  </div>
-                </div>
-              </section>
+      let data = this.optimizelyClassic;
+      let tabs = [
+        ["Info", `<div class="col-3">
+          <dl class="box">
+            <dt>Account Owner</dt>
+            <dd>${data.accountId}</dd>
+          </dl>
+          <dl class="box">
+            <dt>Snippet Revision</dt>
+            <dd>${data.revision}</dd>
+          </dl>
+          <dl class="box">
+            <dt>Approx. Library Size</dt>
+            <dd>${(JSON.stringify(window.optimizely).length / 1e3).toFixed()} KB</dd>
+          </dl>
+          <dl class="box">
+            <dt>Classic Experiments</dt>
+            <dd>${Object.keys(data.experiments).length}</dd>
+          </dl>
+          <dl class="box">
+            <dt>Classic Variations</dt>
+            <dd>${Object.keys(data.variations).length}</dd>
+          </dl>
+          <dl class="box">
+            <dt>Classic Audiences</dt>
+            <dd>${Object.keys(data.audiences).length}</dd>
+          </dl>
+        </div>`]
+      ];
 
-            </div>
-            
-          </section>
-        </div>
-      `);
-      let $optimizelyExperiments = $('<section id="ooo_containerExperiments" class="container"></section>').appendTo($optimizely),
-          $alert = $(`
-            <div id="alert" class="center well alert alert-warning" style="display:none;">
-              <a class="closeme">CLOSE</a>
-            </div>`).appendTo($optimizely);
+      // tabs.push(['all experiments', this.renderAudiences()]);
+      // tabs.push(['live experiments', $(`<p>
+      //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
+      // </p>`)]);
+      // tabs.push(['paused experiments', $(`<p>
+      //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
+      // </p>`)]);
+      // tabs.push(['audiences', $(`<p>
+      //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
+      // </p>`)]);
+      // tabs.push(['your segments', $(`<p>
+      //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
+      // </p>`)]);
+      // tabs.push(['all segments', $(`<p>
+      //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
+      // </p>`)]);
+      // tabs.push(['my experience', $(`<p>
+      //   ${Math.random()} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit assumenda maxime necessitatibus illo aliquam consequuntur unde veritatis aspernatur nulla, facere? Excepturi eius maiores suscipit necessitatibus porro nam dolor, adipisci beatae.
+      // </p>`)]);
 
-      $.each(this.getExperimentId().reverse(), (e, t)=>{
-        $optimizelyExperiments.append(this.addExperiment(t));
-      });
-      $optimizely.find(".closeme").click(function (){
-        $(this).parent().hide();
-        $optimizely.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
-      });
-      $optimizely.find("[filter]").click(function (){
-        $optimizely.find("[experiment_id]").hide();
-        let filter = $(this).attr("filter");
-        $optimizely.find("#ooo_container_visitor > div > div").hide();
-        let $experiments = $optimizelyExperiments.find("." + filter + "Experiment").show();
-        if ($experiments.length){
-          $alert.html("").css("display", "none");
-        }else{
-          $alert.css("display", "block").html("<h2> There are no " + (filter == "ooo" ? "" : filter) + " experiments to show :(");
-        }
-      });
-      $optimizely.find("#view_people button").click(function (){
-        let $this = $(this),
-          t = $this.attr("show"),
-          r = $optimizely.find("#" + t),
-          i = r.is(":visible");
-        $optimizely.find("#ooo_container_visitor .well").hide();
-        r.css("display", i ? "none" : "block");
-        $optimizely.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
-      });
-      $optimizely.find("#show_my_variants").click(function (){
-        let $this = $(this),
-          t = $optimizely.find($this.attr("show")),
-          r = t.is(":visible");
-        t.css("display", r ? "none" : "block");
-        $optimizely.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
-      });
-      return $optimizely;
+      let experiments = '', live = 0, paused = 0;
+      for (let i in data.experiments){
+        let item = data.experiments[i];
+        experiments += `<label class="segment col-sm-5 label">${item.name}</label>`;
+      }
+      tabs.push(['Experiments', `
+        <h2>Experiments:</h2><hr>
+        ${experiments || '<label class="badge badge-danger">There are no Experiments.</label>'}
+      `]);
+
+      let audiences = '';
+      for (let i in data.audiences){
+        let item = data.audiences[i];
+        audiences += `<label class="segment col-sm-5 label">${item.name}</label>`;
+      }
+      tabs.push(['Audiences', `
+        <h2>Audiences:</h2><hr>
+        ${audiences || '<label class="badge badge-danger">There are no Audiences.</label>'}
+      `]);
+
+      let segments = '';
+      for (let i in data.segments){
+        let item = data.segments[i];
+        segments += `<label class="segment col-sm-5 label">${item.name}</label>`;
+      }
+      tabs.push(['Segments', `
+        <h2>Segments:</h2><hr>
+        ${segments || '<label class="badge badge-danger">There are no Segments.</label>'}
+      `]);
+
+      return this.$makeTabs(tabs).addClass('vertical');
     }
+
+    // $optimizelyX(){
+    //   let $optimizely = $(`
+    //     <div class="optimizely">
+    //       <section id="ooo_container_visitors" class="container">
+    //         <div class="well"><br>
+    //           <h1 class="header center">This Site: <b>${window.location.host}</b></h1>
+    //           <div id='account_stats' class="row">
+    //             <div class="col">
+    //               <div>${this.X?'OptX(✔)':'OptX(✗)'}</div><div>${this.C?'Classic(✔)':'Classic(✗)'}</div>
+    //             </div>
+    //             <div class="col">
+    //               <u>Account Owner</u><br><span>${this.accountId}</span>
+    //             </div>
+    //             <div class="col">
+    //               <u>Snippet Revision</u><br><span>${this.revision}</span>
+    //             </div>
+    //             <div class="col">
+    //               <u>Approx. Library Size</u><br><span>${(JSON.stringify(window.optimizely).length / 1e3).toFixed()} KB</span>
+    //             </div>
+    //           </div>
+    //           <div class="row">
+    //             <div class="col">
+    //               <u>X Experiments</u><br><span>${Object.keys(this.xExperiments).length}</span>
+    //             </div>
+    //             <div class="col">
+    //               <u>X Variations</u><br><span>${Object.keys(this.xVariations).length}</span>
+    //             </div>
+    //             <div class="col">
+    //               <u>X Audiences</u><br><span>${Object.keys(this.xAudiences).length}</span>
+    //             </div>
+    //             <div class="col">
+    //               <u>X Campaigns</u><br><span>${Object.keys(this.xCampaigns).length}</span>
+    //             </div>
+    //           </div>
+    //           <div class="row">
+    //             <div class="col">
+    //               <u>Classic Experiments</u><br><span>${Object.keys(this.experiments).length}</span>
+    //             </div>
+    //             <div class="col">
+    //               <u>Classic Variations</u><br><span>${Object.keys(this.variations).length}</span>
+    //             </div>
+    //             <div class="col">
+    //               <u>Classic Audiences</u><br><span>${Object.keys(this.audiences).length}</span>
+    //             </div>
+    //           </div>
+    //         </div><br>
+    //         <div id="ooo_filters" class="row center">
+    //           <div class="btn-group" data-toggle="buttons">
+    //             <span style="font-weight:bolder;font-size:16px;">Experiment Status:&emsp;</span>
+    //             <button class="btn info btn-info" filter="all">ALL EXPERIMENTS</button>
+    //             <button class="btn info btn-info" filter="live">LIVE EXPERIMENTS</button>
+    //             <button class="btn info btn-info" filter="paused">PAUSED EXPERIMENTS</button>
+    //           </div><br>
+    //           <div id="view_people" class="btn-group" data-toggle="button">
+    //             <span style="font-weight:bolder;font-size:16px;">Browse Visitor Criteria:&emsp;</span>
+    //             <button class="btn btn-warning" show="ooo_audiences" id="view_audiences">AUDIENCES</button>
+    //             <button class="btn btn-warning" show="ooo_visitor_you" id="view_visitor_you">YOUR SEGMENTS</button>
+    //             <button class="btn btn-warning" show="ooo_visitor_all" id="view_visitor_all">ALL SEGMENTS</button>
+    //             <button class="btn btn-warning btn-lg" show="my_variants" id="show_my_variants">MY EXPERIENCE</button>
+    //           </div>
+    //           <hr>
+    //           <section id="ooo_container_visitor" class="container">
+    //             <div class="row-fluid">
+    //               <div style="display:none;" id="ooo_audiences" class="well blue col-xs-12">
+    //                 <a class="closeme">CLOSE</a> ${this.renderAudiences()}
+    //               </div>
+    //               <div style="display:none;" id="ooo_visitor_you" class="well blue col-xs-12">
+    //                 <a class="closeme">CLOSE</a> ${this.renderYourSegments()}
+    //               </div>
+    //               <div style="display:none;" id="ooo_visitor_all" class="well blue col-xs-12">
+    //                 <a class="closeme">CLOSE</a> ${this.renderAllSegments()}
+    //               </div>
+    //               <div id="my_variants" class="center well alert alert-info" style="display:none">
+    //                 <a class="closeme">CLOSE</a> ${this.renderMyVariants()}
+    //               </div>
+    //             </div>
+    //           </section>
+
+    //         </div>
+
+    //       </section>
+    //     </div>
+    //   `);
+    //   let $optimizelyExperiments = $('<section id="ooo_containerExperiments" class="container"></section>').appendTo($optimizely),
+    //       $alert = $(`
+    //         <div id="alert" class="center well alert alert-warning" style="display:none;">
+    //           <a class="closeme">CLOSE</a>
+    //         </div>`).appendTo($optimizely);
+
+    //   $.each(this.getExperimentId().reverse(), (e, t)=>{
+    //     $optimizelyExperiments.append(this.addExperiment(t));
+    //   });
+    //   $optimizely.find(".closeme").click(function (){
+    //     $(this).parent().hide();
+    //     $optimizely.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
+    //   });
+    //   $optimizely.find("[filter]").click(function (){
+    //     $optimizely.find("[experiment_id]").hide();
+    //     let filter = $(this).attr("filter");
+    //     $optimizely.find("#ooo_container_visitor > div > div").hide();
+    //     let $experiments = $optimizelyExperiments.find("." + filter + "Experiment").show();
+    //     if ($experiments.length){
+    //       $alert.html("").css("display", "none");
+    //     }else{
+    //       $alert.css("display", "block").html("<h2> There are no " + (filter == "ooo" ? "" : filter) + " experiments to show :(");
+    //     }
+    //   });
+    //   $optimizely.find("#view_people button").click(function (){
+    //     let $this = $(this),
+    //       t = $this.attr("show"),
+    //       r = $optimizely.find("#" + t),
+    //       i = r.is(":visible");
+    //     $optimizely.find("#ooo_container_visitor .well").hide();
+    //     r.css("display", i ? "none" : "block");
+    //     $optimizely.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
+    //   });
+    //   $optimizely.find("#show_my_variants").click(function (){
+    //     let $this = $(this),
+    //       t = $optimizely.find($this.attr("show")),
+    //       r = t.is(":visible");
+    //     t.css("display", r ? "none" : "block");
+    //     $optimizely.find("#ooo_filters > div >  button, #ooo_filters > div > label").removeClass("active");
+    //   });
+    //   return $optimizely;
+    // }
+
 
     
     getExperimentId(id) {
