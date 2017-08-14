@@ -346,7 +346,7 @@
         </dl>
         <dl class="box">
           <dt>Your Attributes</dt>
-          <dd>${Object.keys(data.visitor.custom).reduce((o,i)=>data.visitor.custom[i]&&++o||o,0)}</dd>
+          <dd>${data.visitor.custom?Object.keys(data.visitor.custom).reduce((o,i)=>data.visitor.custom[i]&&++o||o,0):0}</dd>
         </dl>
       </div>`]);
 
