@@ -1,11 +1,11 @@
-(function start(){
+(function start($){
   'use strict';
-  let $ = window.jQuery;
 
   if (!$ || !$.fn || !$.fn.jquery){
     fetch('https://code.jquery.com/jquery-3.2.1.min.js').then(r=>r.text()).then(t=>{
-      new Function(t)();
-      start();
+      let m = {exports:{}};
+      new Function('let module = this;'+t).call(m);
+      start(m.exports);
     });
     return;
   }
@@ -672,4 +672,4 @@
   customElements.define(name, Esper);
   let esper = document.createElement(name);
   document.body.appendChild(esper);
-})();
+})(window.jQuery);
