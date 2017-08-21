@@ -23,7 +23,7 @@
         var b = moment([Number(endDate.substr(0,4)), Number(endDate.substr(4,2))]);
         var monthsBetween = Math.abs(b.diff(a, 'months'));
         var thisClientHours = Number(thisClient.find('.td-hours a').text());
-          var thisClientProfitability = Math.floor((clientMonthly[thisClientName] * monthsBetween) / thisClientHours);
+          var thisClientProfitability = Math.floor((window.clientMonthly[thisClientName] * monthsBetween) / thisClientHours);
           var thisClientProfitabilityStr = "$" + thisClientProfitability + " / hr";
           thisClient.find('.td-profitability').text(thisClientProfitabilityStr);
         }
