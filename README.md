@@ -66,3 +66,6 @@ Description: In case you ever have a reference and you need to know what functio
 
 ## The Button
 A tampermonkey/greasemonkey script that adds a button to the optimizely interface. [More info](/the-button)
+
+## Inject jQuery
+<a href="javascript:fetch('https://code.jquery.com/jquery-3.2.1.min.js').then(r=>r.text()).then(t=>new Function(t)())">jQuery</a>
