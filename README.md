@@ -1,7 +1,8 @@
 # crometrics-snippets
 Collection of CROmetrics snippets and patterns
 
-
+## Installation Instructions
+Drag the bookmarklet link to your bookmarks bar, or right click and save the link as a bookmark.
 
 ## esper - Optimizely Analysis Tool
 ![Optimizely Analysis Tool](http://i.imgur.com/c1dmh17.png)
