@@ -70,3 +70,8 @@ A tampermonkey/greasemonkey script that adds a button to the optimizely interfac
 
 ## Inject jQuery
 <a href="javascript:fetch('https://code.jquery.com/jquery-3.2.1.min.js').then(r=>r.text()).then(t=>new Function(t)())">jQuery</a>
+
+## Hide the Optimizely QA Ball
+***Usage:*** Run the bookmarklet on an Optimizely preview link. Run it again to bring the QA ball back.
+
+***Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/optimizely/hide-ball.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>.***

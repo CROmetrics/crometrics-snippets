@@ -1,0 +1,2 @@
+// Toggles the display of the blue QA ball on preview links.
+javascript:( (function() {var optlyPreview = document.querySelector('optly-preview'); var style = window.getComputedStyle(optlyPreview); if(style.display === 'none') optlyPreview.style.display = 'block'; else optlyPreview.style.display = 'none';})() )
