@@ -24,7 +24,20 @@
   });
 
   let parsePage = (page, depth)=>{
-    return fetch(page).then(r=>r.text()).then(t=>{
+    return fetch(page).then((r)=>{
+      if (r.url !== page && r.url !== page+'/'){
+        console.error(page, '=>', r.url);
+        if (pages[page]){
+          pages[r.url] = pages[page].concat(pages[r.url]);
+          delete pages[page];
+        }
+        page = r.url;
+      }
+      return r.text();
+    }).then(t=>{
+      //strip any trailing slashes so that we don't have /ddos/ and /ddos in the results
+      // if (page.length > 1) page = page.replace(/\/$/, '');
+
       let promises = [];
       if (t){
         let start = t.indexOf('<body'), end = t.indexOf('</body>')+7;
@@ -37,7 +50,8 @@
           let keywords = doc.querySelector('meta[name="keywords"]');
           if (keywords){
             let kw = keywords.content.trim();
-            if (kw) pages[page].push(kw);
+            let pageObj = (pages[page] || []);
+            if (kw) pageObj.push(kw);
           }
           doc.querySelectorAll('a').forEach(el=>{
             let newLink = parseLink(el);
