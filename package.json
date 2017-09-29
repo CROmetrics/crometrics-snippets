@@ -21,6 +21,7 @@
     "babel-plugin-transform-es2015-template-literals": "^6.22.0",
     "babel-preset-babili": "^0.1.4",
     "css-loader": "^0.28.4",
+    "express": "^4.16.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-rename": "^1.2.2",
@@ -30,5 +31,6 @@
     "to-string-loader": "^1.1.5",
     "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony-v2.8.22",
     "webpack": "^3.5.4"
-  }
+  },
+  "dependencies": {}
 }
