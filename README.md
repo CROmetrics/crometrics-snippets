@@ -60,6 +60,12 @@ Description: In case you ever have a reference and you need to know what functio
 
 ***Usage:*** `window.feasibility.injectFeelers(obj, ignoreKeys = [])`
 
+**Watch React property changes:**
+This will find the element's react instance and monkeypatch the props object. Changes are sent to the console as a psudo-diff of the changes. This is useful for finding properties that can be relied upon to detect state changes in an SPA.
+
+***Usage:*** `feasibility.watchReactProps(el)`
+Note: if `el` is left blank it'll try to find the reactroot element by default.
+
 #### Install:
 ***Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/feasibility/utilities.min.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>.***
 
