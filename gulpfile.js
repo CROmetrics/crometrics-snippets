@@ -26,7 +26,6 @@ gulp.task('compile', () => {
 
 gulp.task('default', ['host']);
 gulp.task('host', ['compile'], function(){
-  const host = import
   const fs = require('fs');
   const express = require('express');
   const app = express();
