@@ -1,12 +1,34 @@
 (function () {
+    
 
-    var script_jQuery=document.createElement('script');
-    script_jQuery.setAttribute('src','//code.jquery.com/jquery-latest.min.js');
-    document.body.appendChild(script_jQuery);
+    var loadScript = function (location, callback) {
+      var fileRef = document.createElement('script');
+      fileRef.setAttribute('type', 'text/javascript');
+
+      if (callback) {
+        if (fileRef.readyState) { // IE
+          fileRef.onreadystatechange = function () {
+            if (fileRef.readyState == 'loaded' || fileRef.readyState == 'complete') {
+              fileRef.onreadystatechange = null;
+              callback();
+            }
+          };
+        } else { // Non-IE
+          fileRef.onload = function () {
+            callback();
+          };
+        }
+      }
+
+      fileRef.setAttribute('src', location);
+      document.head.appendChild(fileRef);
+    };
+
+    loadScript('//code.jquery.com/jquery-latest.min.js', function(){ console.log(window.jQuery);});
     
     (function poll(){
       console.log('polling');
-      if(typeof window.jQuery !== 'function') setTimeout(poll, 50);
+      if(typeof window.jQuery !== 'function') return setTimeout(poll, 50);
       console.log(window.jQuery);
       let $ = window.jQuery;
       var clientsTable = $('#clients-table').children('tbody');
