@@ -6,7 +6,8 @@
     
     (function poll(){
       if(!window.jQuery) setTimeout(poll, 50);
-    
+      console.log(window.jQuery);
+      let $ = window.jQuery;
       var clientsTable = $('#clients-table').children('tbody');
       console.log(clientsTable);
 
