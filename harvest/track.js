@@ -5,7 +5,8 @@
     document.body.appendChild(script_jQuery);
     
     (function poll(){
-      if(!window.jQuery) setTimeout(poll, 50);
+      console.log('polling');
+      if(typeof window.jQuery !== 'function') setTimeout(poll, 50);
       console.log(window.jQuery);
       let $ = window.jQuery;
       var clientsTable = $('#clients-table').children('tbody');
