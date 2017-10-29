@@ -1,71 +1,40 @@
 (function () {
-    
 
-    var loadScript = function (location, callback) {
-      var fileRef = document.createElement('script');
-      fileRef.setAttribute('type', 'text/javascript');
+  setTimeout(function(){
 
-      if (callback) {
-        if (fileRef.readyState) { // IE
-          fileRef.onreadystatechange = function () {
-            if (fileRef.readyState == 'loaded' || fileRef.readyState == 'complete') {
-              fileRef.onreadystatechange = null;
-              callback();
-            }
-          };
-        } else { // Non-IE
-          fileRef.onload = function () {
-            callback();
-          };
+    var clientsTable = $('#clients-table').children('tbody');
+    console.log(clientsTable);
+
+    if (clientsTable.length > 0) {
+
+      // Insert a New "Profitability" Column
+      $('#clients-table th.td-item').after('<th class="td-profitability"><span>Profitability</span></th>');
+      // Insert the Profitability Cell
+      $('#clients-table td.td-item').after('<td class="td-profitability"></td>');
+
+      clientsTable.each(function(i){
+        var thisClient = $(this);
+        var thisClientName = thisClient.find('.td-item a').text();
+
+        if (clientNames.indexOf(thisClientName) > -1) {
+          var beginDate = getParam('from');
+          var endDate = getParam('till');
+        var a = moment([Number(beginDate.substr(0,4)), Number(beginDate.substr(4,2))]);
+        var b = moment([Number(endDate.substr(0,4)), Number(endDate.substr(4,2))]);
+        var monthsBetween = Math.abs(b.diff(a, 'months'));
+        var thisClientHours = Number(thisClient.find('.td-hours a').text());
+          var thisClientProfitability = Math.floor((window.clientMonthly[thisClientName] * monthsBetween) / thisClientHours);
+          var thisClientProfitabilityStr = "$" + thisClientProfitability + " / hr";
+          thisClient.find('.td-profitability').text(thisClientProfitabilityStr);
         }
-      }
+      });
 
-      fileRef.setAttribute('src', location);
-      document.head.appendChild(fileRef);
-    };
+    }
+    else {
+      console.log("[Harvest] Profitability View: Abort! Not a Client Report!");
+    }
 
-    loadScript('//code.jquery.com/jquery-latest.min.js', function(){ console.log(window.jQuery);});
-    
-    (function poll(){
-      console.log('polling');
-      if(typeof window.jQuery !== 'function') return setTimeout(poll, 50);
-      console.log(window.jQuery);
-      let $ = window.jQuery;
-      var clientsTable = $('#clients-table').children('tbody');
-      console.log(clientsTable);
-
-      if (clientsTable.length > 0) {
-
-        // Insert a New "Profitability" Column
-        $('#clients-table th.td-item').after('<th class="td-profitability"><span>Profitability</span></th>');
-        // Insert the Profitability Cell
-        $('#clients-table td.td-item').after('<td class="td-profitability"></td>');
-
-        clientsTable.each(function(i){
-          var thisClient = $(this);
-          var thisClientName = thisClient.find('.td-item a').text();
-
-          if (clientNames.indexOf(thisClientName) > -1) {
-            var beginDate = getParam('from');
-            var endDate = getParam('till');
-          var a = moment([Number(beginDate.substr(0,4)), Number(beginDate.substr(4,2))]);
-          var b = moment([Number(endDate.substr(0,4)), Number(endDate.substr(4,2))]);
-          var monthsBetween = Math.abs(b.diff(a, 'months'));
-          var thisClientHours = Number(thisClient.find('.td-hours a').text());
-            var thisClientProfitability = Math.floor((window.clientMonthly[thisClientName] * monthsBetween) / thisClientHours);
-            var thisClientProfitabilityStr = "$" + thisClientProfitability + " / hr";
-            thisClient.find('.td-profitability').text(thisClientProfitabilityStr);
-          }
-        });
-
-      }
-      else {
-        console.log("[Harvest] Profitability View: Abort! Not a Client Report!");
-      }
-
-    })();
-
-
+  }, 500);
 
   function getParam(name, url) {
 	    if (!url) {
