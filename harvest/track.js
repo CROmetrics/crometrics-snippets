@@ -71,7 +71,7 @@
         var clientName = client.querySelectorAll('.td-item a')[0].textContent;
         var hours = client.querySelectorAll('.td-hours a')[0].textContent;
 
-        if(clientNames.indexOf(thisClientName) > -1){        
+        if(clientNames.indexOf(clientName) > -1){        
           var beginDate = getParam('from');
           var endDate = getParam('till');
           var a = moment([Number(beginDate.substr(0,4)), Number(beginDate.substr(4,2))]);

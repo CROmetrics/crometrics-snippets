@@ -13,8 +13,8 @@
   console.log(threeMonthProfitability);
 
   setTimeout(function(){
-    document.querySelectorAll('#sub-nav .sub-nav-tabs').append('<li><a href="' + lastMonthProfitability + '">Last Month</a>');	
-    document.querySelectorAll('#sub-nav .sub-nav-tabs').append('<li><a href="' + threeMonthProfitability + '">Last 3 Months</a>');	
+    $('#sub-nav .sub-nav-tabs').append('<li><a href="' + lastMonthProfitability + '">Last Month</a>');	
+    $('#sub-nav .sub-nav-tabs').append('<li><a href="' + threeMonthProfitability + '">Last 3 Months</a>');	
   }, 500);
   
 })();
