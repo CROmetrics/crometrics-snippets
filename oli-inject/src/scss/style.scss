@@ -1,19 +1,21 @@
-@import "cayman";
-
-.demo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 30px;
-
-  form label {
-    display: block;
-    font-weight: normal;
-  }
+body {
+  padding: 20px;
 }
 
-.demo-funnel {
-  width: 320px;
-  height: 400px;
-  margin-right: 50px;
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}
+
+.footer>.container {
+  padding-top: 20px;
+}
+
+ol li,
+ul li {
+  margin-bottom: 10px;
 }

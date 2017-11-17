@@ -1,5 +1,4 @@
 const gulp = require('gulp');
-const scssLint = require('gulp-scss-lint');
 const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const webpack = require('webpack');
@@ -9,8 +8,6 @@ const testWebpackConfig = require('./webpack.test.config.js');
 
 gulp.task('build-style', () => (
   gulp.src('./src/scss/**/*.scss')
-      .pipe(scssLint())
-      .pipe(scssLint.failReporter())
       .pipe(sass({
           outputStyle: 'expanded',
       }).on('error', sass.logError))
@@ -35,7 +32,16 @@ gulp.task('build-html', () => (
 ));
 
 gulp.task('default', ['build-style', 'build-script', 'build-html'], () => {
-  browserSync.init({ server: './dist' });
+  browserSync.init({ 
+    server: {
+      baseDir: './dist',
+      cors: true,
+      // middleware: function (req, res, next) {
+      //   res.setHeader('Access-Control-Allow-Origin', '*');
+      //   next();
+      // }
+    }
+  });
 
   gulp.watch(['./src/**/*.js', './src/**/*.js'], ['build-script']);
   gulp.watch(['./src/scss/**/*.scss'], ['build-style']);
