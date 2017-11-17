@@ -89,11 +89,11 @@ let $template = (popup, json) => {
     window.opener.location = `${parentUri.protocol}//${parentUri.host}${parentUri.pathname}?${json.query_param}=${paramValue}${query ? '&' + query : ''}${parentUri.hash || ''}`;
     window.close();
   };
-  let $interior = $('<div>');
+  let $el = $('<div>');
 
   if (json.pages) {
-    $interior.append(`<h3>Variations:</h3>`);
-    let $ol = $(`<ol start="0">`).appendTo($interior);
+    $el.append(`<h3>Variations:</h3>`);
+    let $ol = $(`<ol start="0">`).appendTo($el);
     for (let variation of json.variations) {
       let $vLi = $(`<li>`).appendTo($ol);
       $vLi.append(`<h4>${variation.name}</h4>`);
@@ -111,11 +111,11 @@ let $template = (popup, json) => {
         }).prependTo($li);
       }
     }
-    $interior.append(`<a target="_blank" class="btn btn-default" href="/shared.js">shared.js</a>`);
-    $interior.append(`<a target="_blank" class="btn btn-default" href="/shared.css">shared.css</a>`);
+    $el.append(`<a target="_blank" class="btn btn-default" href="/shared.js">shared.js</a>`);
+    $el.append(`<a target="_blank" class="btn btn-default" href="/shared.css">shared.css</a>`);
   } else if (json.variations) {
-    $interior.append(`<h4>Variations:</h4>`);
-    let $ol = $(`<ol start="0">`).appendTo($interior);
+    $el.append(`<h4>Variations:</h4>`);
+    let $ol = $(`<ol start="0">`).appendTo($el);
     for (var v in json.variations) {
       let $li = $(`
       <li style="font-size: 1.2em;">
@@ -126,28 +126,39 @@ let $template = (popup, json) => {
         setParam(v);
       }).prependTo($li);
     }
-    $interior.append(`<a target="_blank" class="btn btn-default" href="/experiment.css">experiment.css</a>`);
+    $el.append(`<a target="_blank" class="btn btn-default" href="/experiment.css">experiment.css</a>`);
   } else if (hosting == 'extension') {
     $(`<button class="btn btn-primary">Preview Extension</button>`).click(() => {
       setParam('extension');
-    }).prependTo($interior);
-    $interior.append(`<br>`);
-    $interior.append(`<a target="_blank" href="/inject.js">inject.js</a> <a target="_blank" href="/extension.css">extension.css</a>`);
+    }).appendTo($el);
+    $el.append(`<br>`);
+    $el.append(`<a target="_blank" href="/inject.js">inject.js</a> <a target="_blank" href="/extension.css">extension.css</a>`);
   } else if (hosting == 'project') {
     $(`<button class="btn btn-primary">ProjectJS local preview</button>`).click(() => {
       setParam('project&optimizely_disable=true');
-    }).prependTo($interior);
-    $interior.append(`<br>`);
-    $interior.append(`<a target="_blank" href="/inject.js">inject.js</a>`);
+    }).appendTo($el);
+    $el.append(`<br>`);
+    $el.append(`<a target="_blank" href="/inject.js">inject.js</a>`);
   } else {
-    $interior.append(`<h4>Not hosting any variations.</h4>`);
+    $el.append(`<h4>Not hosting any variations.</h4>`);
   }
-  return $interior;
+  return $el;
+};
+
+let $error = e => {
+  let $el = $('<div>');
+  $el.append(`<h3>Whoops! Unable to connect to OLI!</h3><p>Run this bookmark after first hosting something with OLI.</p>`);
+  $(`<button class="btn btn-primary">Close</button>`).click(() => {
+    window.close();
+  }).appendTo($el);
+  return $el;
 };
 
 window.addEventListener('message', e => {
   getData.then(json => {
     $('#display').html($template(e.data, json));
+  }).catch(e => {
+    $('#display').html($error(e));
   });
 });
 
