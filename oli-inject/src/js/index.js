@@ -1,5 +1,4 @@
 const Url = require('url');
-let getData = fetch('https://localhost:8011/info.json').then(_ => _.json());
 
 let $template = (popup, json)=>{
   let parentUri = Url.parse(popup.url);
@@ -75,13 +74,26 @@ let $error = e=>{
   return $el;
 };
 
+let $bookmarklet = e => {
+  let $el = $('<div>');
+  let snippet = require('../../bookmarklet').replace(/\n/g, '');
+  $el.append(`
+  <p>Install the <a href="${snippet}">bookmarklet</a>.</p>
+  <p>Run it on the page you want to inject OLI into. Make sure you are hosting something before running the bookmarklet.</p>`);
+  return $el;
+};
+
 window.addEventListener('message', e=>{
-  getData.then(json=>{
+  fetch('https://localhost:8011/info.json').then(_=>_.json()).then(json=>{
     $('#display').html($template(e.data, json));
-  }).catch(e=>{
+  }).catch(e => {
     $('#display').html($error(e));
   });
 });
 
-window.opener.postMessage('ready', '*');
+if (!window.opener){
+  $('#display').html($bookmarklet);
+}else{
+  window.opener.postMessage('ready', '*');
+}
 

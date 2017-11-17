@@ -14,6 +14,10 @@ module.exports = {
 	module: {
 		rules: [
 			{
+				test: /bookmarklet/,
+				loader: 'string-loader',
+			},
+			{
 				test: /\.js?$/,
 				exclude: /(node_modules|bower_components|vender_modules)/,
 				loader: 'babel-loader',
