@@ -7,7 +7,7 @@
 		exports["D3Funnel"] = factory();
 	else
 		root["D3Funnel"] = factory();
-})(this, function() {
+})(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -145,6 +145,7 @@ let $template = (popup, json) => {
 };
 
 let $error = e => {
+  console.error(e);
   let $el = $('<div>');
   $el.append(`<h3>Whoops! Unable to connect to OLI!</h3><p>Run this bookmark after first hosting something with OLI.</p>`);
   $(`<button class="btn btn-primary">Close</button>`).click(() => {
@@ -1431,9 +1432,9 @@ Url.prototype.parseHost = function() {
 	if (
 		true
 	) {
-		!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
+		!(__WEBPACK_AMD_DEFINE_RESULT__ = (function() {
 			return punycode;
-		}.call(exports, __webpack_require__, exports, module),
+		}).call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	} else if (freeExports && freeModule) {
 		if (module.exports == freeExports) {

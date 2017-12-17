@@ -66,6 +66,7 @@ let $template = (popup, json)=>{
 };
 
 let $error = e=>{
+  console.error(e);
   let $el = $('<div>');
   $el.append(`<h3>Whoops! Unable to connect to OLI!</h3><p>Run this bookmark after first hosting something with OLI.</p>`);
   $(`<button class="btn btn-primary">Close</button>`).click(() => {
