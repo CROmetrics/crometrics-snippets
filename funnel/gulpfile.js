@@ -5,7 +5,7 @@ const autoprefixer = require('gulp-autoprefixer');
 const webpack = require('webpack');
 const webpackStream = require('webpack-stream');
 const browserSync = require('browser-sync').create();
-const testWebpackConfig = require('./webpack.test.config.js');
+const webpackConfig = require('./webpack.config.js');
 
 gulp.task('build-style', () => (
   gulp.src('./src/scss/**/*.scss')
@@ -23,7 +23,7 @@ gulp.task('build-style', () => (
 
 gulp.task('build-script', () => (
   gulp.src(['./src/js/index.js'])
-      .pipe(webpackStream(testWebpackConfig, webpack))
+      .pipe(webpackStream(webpackConfig, webpack))
       .pipe(gulp.dest('./dist/js'))
       .pipe(browserSync.stream())
 ));

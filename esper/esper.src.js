@@ -64,10 +64,9 @@
           let activeExperiments = state.getActiveExperimentIds();
           let campaignStates = state.getCampaignStates();
 
-          for (let i in activeExperiments){
-            let id = activeExperiments[i];
+          activeExperiments.forEach(id=>{
             this.optimizelyX.experiments[id].active = true;
-          }
+          });
           for (let id in campaignStates){
             let campState = campaignStates[id];
             let campaign = this.optimizelyX.campaigns[campState.id];
@@ -132,8 +131,8 @@
       let $tabs = $(`<div class="tabs">`).appendTo($section);
       if (tabs.length){
         let tabCount = 0;
-        for (let t in tabs){
-          let [label, $content] = tabs[t];
+        tabs.forEach(tab=>{
+          let [label, $content] = tab;
           // let key = label.replace(/[^\w]/g, '');
           let $tab = $(`<div class="tab"></div>`).append($content).appendTo($tabs);
           let $link = $(`<a href="#">${label}</a>`).appendTo($links).click(e=>{
@@ -144,7 +143,7 @@
             $link.addClass('active');
           }).wrap('<li>');
           if (!(tabCount++)) $tab.add($link).addClass('active');
-        }
+        });
       }else{
         $tabs.html('Nothing found.');
       }
