@@ -3,8 +3,8 @@ const path = require('path');
 module.exports = {
 	output: {
 		filename: 'index.js',
-		libraryTarget: 'umd',
-		library: 'D3Funnel',
+		// libraryTarget: 'umd',
+		// library: 'D3Funnel',
 	},
 	// resolve: {
 	// 	alias: {
