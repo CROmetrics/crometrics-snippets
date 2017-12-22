@@ -85,11 +85,13 @@ let $bookmarklet = e => {
 };
 
 window.addEventListener('message', e=>{
-  fetch('https://localhost:8011/info.json').then(_=>_.json()).then(json=>{
-    $('#display').html($template(e.data, json));
-  }).catch(e => {
-    $('#display').html($error(e));
-  });
+  if (e.data && e.data.url){
+    fetch('https://localhost:8011/info.json').then(_=>_.json()).then(json=>{
+      $('#display').html($template(e.data, json));
+    }).catch(e => {
+      $('#display').html($error(e));
+    });
+  }
 });
 
 if (!window.opener){

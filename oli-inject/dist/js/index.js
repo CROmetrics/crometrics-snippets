@@ -7,7 +7,7 @@
 		exports["D3Funnel"] = factory();
 	else
 		root["D3Funnel"] = factory();
-})(typeof self !== 'undefined' ? self : this, function() {
+})(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -164,11 +164,13 @@ let $bookmarklet = e => {
 };
 
 window.addEventListener('message', e => {
-  fetch('https://localhost:8011/info.json').then(_ => _.json()).then(json => {
-    $('#display').html($template(e.data, json));
-  }).catch(e => {
-    $('#display').html($error(e));
-  });
+  if (e.data && e.data.url) {
+    fetch('https://localhost:8011/info.json').then(_ => _.json()).then(json => {
+      $('#display').html($template(e.data, json));
+    }).catch(e => {
+      $('#display').html($error(e));
+    });
+  }
 });
 
 if (!window.opener) {
@@ -1432,9 +1434,9 @@ Url.prototype.parseHost = function() {
 	if (
 		true
 	) {
-		!(__WEBPACK_AMD_DEFINE_RESULT__ = (function() {
+		!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
 			return punycode;
-		}).call(exports, __webpack_require__, exports, module),
+		}.call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	} else if (freeExports && freeModule) {
 		if (module.exports == freeExports) {
