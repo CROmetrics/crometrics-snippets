@@ -116,13 +116,13 @@ let $template = (popup, json) => {
       }).prependTo($li);
     }
     $el.append(`<a target="_blank" class="btn btn-default" href="/experiment.css">experiment.css</a>`);
-  } else if (hosting == 'extension') {
+  } else if (json.hosting == 'extension') {
     $(`<button class="btn btn-primary">Preview Extension</button>`).click(() => {
       setParam('extension');
     }).appendTo($el);
     $el.append(`<br>`);
     $el.append(`<a target="_blank" href="/inject.js">inject.js</a> <a target="_blank" href="/extension.css">extension.css</a>`);
-  } else if (hosting == 'project') {
+  } else if (json.hosting == 'project') {
     $(`<button class="btn btn-primary">ProjectJS local preview</button>`).click(() => {
       setParam('project&optimizely_disable=true');
     }).appendTo($el);
