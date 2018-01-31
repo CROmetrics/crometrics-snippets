@@ -4,6 +4,12 @@ Collection of CROmetrics snippets and patterns
 ## Installation Instructions
 Drag the bookmarklet link to your bookmarks bar, or right click and save the link as a bookmark.
 
+## Hide Google Hangout
+
+Toggle hide/show your own video in the bottom right of google hangouts.
+
+Install by dragging this into your bookmarks bar: <a href="javascript:(function(){/*tom@crometrics.com*/var el=[].slice.call(document.querySelectorAll(`[aria-label^='Open menu for']`)).pop();el.style.display=!el.style.display?'none':''})()">hideme</a>
+
 ## esper - Optimizely Analysis Tool
 ![Optimizely Analysis Tool](http://i.imgur.com/c1dmh17.png)
 This opens a panel which displays information about the optimizely snippet running on the active page.
