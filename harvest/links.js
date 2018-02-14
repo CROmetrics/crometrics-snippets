@@ -11,7 +11,8 @@
   var lastMonthProfitability = "https://crometrics.harvestapp.com/reports?from=" + lastMonthBackDateParam + "&till=" + todayDateParam + "&kind=custom#clients";
 
   console.log(threeMonthProfitability);
-
+  
+  debugger;
   $(function(){
     $('#sub-nav .sub-nav-tabs').append('<li><a href="' + lastMonthProfitability + '">Last Month</a>');	
     $('#sub-nav .sub-nav-tabs').append('<li><a href="' + threeMonthProfitability + '">Last 3 Months</a>');	
