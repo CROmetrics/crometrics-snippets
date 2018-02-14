@@ -13,36 +13,6 @@
   }
 
   var clientMonthly = {
-      "Taulia": 5700,
-      "Cutco": 10000,
-      "Incapsula": 6000,
-      "Sierra Club": 12000,
-      "ExecRank": 10000,
-      "Ring": 6000,
-      "TinTri": 4500,
-      "Healthy Paws": 7000,
-      "Digital Room": 7000,
-      "Hint Water": 6000,
-      "Navex": 7000,
-      "Imperva": 7750,
-      "Coldwell Banker": 7000,
-      "HotChalk": 10000,
-      "Borrowell": 8000,
-      "Tree Hut Design": 8500,
-      "FilmStruck": 8000,
-      "Alimed": 8000,
-      "FreshDirect": 11000,
-      "Freedom Financial": 10000,
-      "Gump's": 8000,
-      "Smart Communications": 7000,
-      "The Information": 6000,
-      "LovetoKnow": 8000,
-      "Bonnier": 14000,
-      "The Penny Hoarder": 8500,
-      "Habit.com": 45000,
-      "MoMa": 4000,
-      "New Pig": 4000,
-      "Regent Seven Seas": 4000,
       "Greentech Media": 4000
   };
 
