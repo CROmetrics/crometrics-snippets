@@ -1,4 +1,4 @@
-(function () {
+(function ($) {
 
   function getParam(name, url) {
     if (!url) {
@@ -80,5 +80,5 @@
 
   }, 500);
   
-})();
+})(window.$jq);
 
