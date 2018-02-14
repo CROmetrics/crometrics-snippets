@@ -1,4 +1,4 @@
-(function () {
+(function ($) {
 
   var todayDateParam = moment().format("YYYYMMDD");
   var threeMonthBackDate = moment().subtract(3, "months");
@@ -18,4 +18,4 @@
     $('#sub-nav .sub-nav-tabs').append('<li><a href="' + threeMonthProfitability + '">Last 3 Months</a>');	
   });
   
-})();
+})(window.$jq);
