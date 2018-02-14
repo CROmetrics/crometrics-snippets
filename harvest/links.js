@@ -12,9 +12,9 @@
 
   console.log(threeMonthProfitability);
 
-  setTimeout(function(){
+  $(function(){
     $('#sub-nav .sub-nav-tabs').append('<li><a href="' + lastMonthProfitability + '">Last Month</a>');	
     $('#sub-nav .sub-nav-tabs').append('<li><a href="' + threeMonthProfitability + '">Last 3 Months</a>');	
-  }, 500);
+  });
   
 })();
