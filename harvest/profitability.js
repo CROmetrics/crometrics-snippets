@@ -26,9 +26,7 @@
 	}
 
     var clientMonthly = {
-        
-        "FreshDirect": 1000,
-        
+        "Demo": 20000
     };
 
     var clientNames = Object.keys(clientMonthly);
@@ -53,25 +51,32 @@
 	    		if (clientNames.indexOf(thisClientName) > -1) {
 	    			var beginDate = getParam('from');
 	    			var endDate = getParam('till');
-                    var beginDateArray = beginDate.match(/(\d+)-(\d+)-(\d+)/);
-                    var endDateArray = endDate.match(/(\d+)-(\d+)-(\d+)/);
-					var a = moment({
-						'year': beginDateArray[1],
-						'month': beginDateArray[2],
-						'date': beginDateArray[3]
-					});
-					var b = moment({
-						'year': endDateArray[1],
-						'month': endDateArray[2],
-						'date': endDateArray[3]
-					});
-					var monthsBetween = Math.abs(b.diff(a, 'months'));
+                    var beginMoment = moment(beginDate, "YYYY-MM-DD");
+                    var endMoment = moment(endDate, "YYYY-MM-DD");
+
+					var monthsBetween = Math.abs(endMoment.diff(beginMoment, 'months'));
 					var thisClientHours = Number(thisClient.find('.td-hours a').text());
 
 					// Profitability = (Monthly Retainer * Months in Range) / Client Hours Spent in Range
-	    			var thisClientProfitability = Math.floor((clientMonthly[thisClientName] * monthsBetween) / thisClientHours);
-	    			var thisClientProfitabilityStr = "$" + thisClientProfitability + " / hr";
-	    			thisClient.find('.td-profitability').text(thisClientProfitabilityStr);
+                    // OverheadCost = Monthly Revenue * 47.5%
+                    // Margin = Monthly Revenue - (Hours * $160/hr Hourly Rate) - OverheadCost
+                    // Net Margin = Margin / Monthly Revenue
+
+                    var totalRevenue = clientMonthly[thisClientName] * monthsBetween
+
+                    // Fixed Hourly, Calculate Margin
+                    // var thisClientProfitability = Math.floor(totalRevenue - (thisClientHours * 160) - (totalRevenue * 0.475));
+                    // thisClientProfitability = Math.round((thisClientProfitability / totalRevenue)*100);
+                    // var thisClientProfitabilityStr = "" + thisClientProfitability + "%";
+
+                    // Fixed Margin, Calculate Hourly
+                    // var thisClientProfitability = Math.abs(((totalRevenue * 0.1) - totalRevenue + (totalRevenue * 0.475)) / thisClientHours);
+                    // var thisClientProfitabilityStr = "$" + Math.floor(thisClientProfitability) + " / hr";
+
+                    var thisClientProfitability = Math.floor((clientMonthly[thisClientName] * monthsBetween) / thisClientHours);
+                    var thisClientProfitabilityStr = "$" + thisClientProfitability + " / hr";
+
+                    thisClient.find('.td-profitability').text(thisClientProfitabilityStr);
 	    		}
 	    	});
 
