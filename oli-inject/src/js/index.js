@@ -1,54 +1,64 @@
 const Url = require('url');
 
-let $template = (popup, json)=>{
+let $template = (popup, json) => {
   let parentUri = Url.parse(popup.url);
   console.log(popup, json, parentUri);
 
-  let setParam = (paramValue) => {
+  const getNewUrl = (paramValue, optimizelyDisable = false) => {
     let query = parentUri.query && parentUri.query.replace(new RegExp(`${json.query_param}=[^&]*`, 'ig'), '') || '';
-    window.opener.location = `${parentUri.protocol}//${parentUri.host}${parentUri.pathname}?${json.query_param}=${paramValue}${query ? '&' + query : ''}${parentUri.hash || ''}`;
+    if (optimizelyDisable && parentUri.query.indexOf('optimizely_disable=true' === -1)) query += '&optimizely_disable=true';
+    return `${parentUri.protocol}//${parentUri.host}${parentUri.pathname}?${json.query_param}=${paramValue}${query ? '&' + query : ''}${parentUri.hash || ''}`;
+  };
+
+  let setParam = (...args) => {
+    window.opener.location = getNewUrl(...args);
     window.close();
   };
   let $el = $('<div>');
 
-  if (json.pages){
+  if (json.pages) {
     $el.append(`<h3>Variations:</h3>`);
     let $ol = $(`<ol start="0">`).appendTo($el);
-    for (let variation of json.variations){
+    for (let variation of json.variations) {
       let $vLi = $(`<li>`).appendTo($ol);
       $vLi.append(`<h4>${variation.name}</h4>`);
       $vLi.append(`<h5>Pages:</h5>`);
       let $ul = $(`<ul style="padding-left: 20px;">`).appendTo($vLi);
-        for (let page of json.pages){
-          let $li = $(`<li>
+      for (let page of json.pages) {
+        let $li = $(`<li>
             <br>
             <ID: <code>${variation.tag + '.' + page.tag}</code><br>
             <small><a target="_blank" href="/${variation.tag + '.' + page.tag}.js">${variation.tag + '.' + page.tag}.js</a></small>
             <small><a target="_blank" href="/${variation.tag + '.' + page.tag}.css">${variation.tag + '.' + page.tag}.css</a></small>
           </li>`).appendTo($ul);
-          $(`<button class="btn btn-primary">${page.name}</button>`).click(()=>{
-            setParam(variation.tag + '.' + page.tag);
-          }).prependTo($li);
-        }
+        $(`<button class="btn btn-primary">${page.name}</button>`).click(() => {
+          setParam(variation.tag + '.' + page.tag);
+        }).prependTo($li);
+      }
     }
     $el.append(`<a target="_blank" class="btn btn-default" href="/shared.js">shared.js</a>`);
     $el.append(`<a target="_blank" class="btn btn-default" href="/shared.css">shared.css</a>`);
-  } else if (json.variations){
+  } else if (json.variations) {
     $el.append(`<h4>Variations:</h4>`);
     let $ol = $(`<ol start="0">`).appendTo($el);
-    for (var v in json.variations){
+    for (var v in json.variations) {
       let $li = $(`
       <li style="font-size: 1.2em;">
         <br>
         <small><a target="_blank" href="/${v}/inject.js">inject.js</a></small>
       </li>`).appendTo($ol);
-      $(`<button class="btn btn-primary">${json.variations[v]}</button>`).click(()=>{
+      $(`<a href="${getNewUrl(v)}" class="btn btn-primary">${json.variations[v]}</a>`).click(e => {
+        e.preventDefault();
         setParam(v);
+      }).prependTo($li);
+      $(`<a href="${getNewUrl(v,true)}" class="btn btn-primary">${json.variations[v]} + PJS</a>`).click(e => {
+        e.preventDefault();
+        setParam(v, true);
       }).prependTo($li);
     }
     $el.append(`<a target="_blank" class="btn btn-default" href="/experiment.css">experiment.css</a>`);
-  } else if (hosting == 'extension') { 
-    $(`<button class="btn btn-primary">Preview Extension</button>`).click(()=>{
+  } else if (hosting == 'extension') {
+    $(`<button class="btn btn-primary">Preview Extension</button>`).click(() => {
       setParam('extension');
     }).appendTo($el);
     $el.append(`<br>`);
@@ -65,7 +75,7 @@ let $template = (popup, json)=>{
   return $el;
 };
 
-let $error = e=>{
+let $error = e => {
   console.error(e);
   let $el = $('<div>');
   $el.append(`<h3>Whoops! Unable to connect to OLI!</h3><p>Run this bookmark after first hosting something with OLI.</p>`);
@@ -84,9 +94,9 @@ let $bookmarklet = e => {
   return $el;
 };
 
-window.addEventListener('message', e=>{
-  if (e.data && e.data.url){
-    fetch('https://localhost:8011/info.json').then(_=>_.json()).then(json=>{
+window.addEventListener('message', e => {
+  if (e.data && e.data.url) {
+    fetch('https://localhost:8011/info.json').then(_ => _.json()).then(json => {
       $('#display').html($template(e.data, json));
     }).catch(e => {
       $('#display').html($error(e));
@@ -94,9 +104,8 @@ window.addEventListener('message', e=>{
   }
 });
 
-if (!window.opener){
+if (!window.opener) {
   $('#display').html($bookmarklet);
-}else{
+} else {
   window.opener.postMessage('ready', '*');
 }
-
