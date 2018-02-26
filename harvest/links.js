@@ -1,4 +1,4 @@
-(function () {
+(function ($) {
 
   var todayDateParam = moment().format("YYYYMMDD");
   var threeMonthBackDate = moment().subtract(3, "months");
@@ -11,10 +11,11 @@
   var lastMonthProfitability = "https://crometrics.harvestapp.com/reports?from=" + lastMonthBackDateParam + "&till=" + todayDateParam + "&kind=custom#clients";
 
   console.log(threeMonthProfitability);
-
-  setTimeout(function(){
+  
+  debugger;
+  $(function(){
     $('#sub-nav .sub-nav-tabs').append('<li><a href="' + lastMonthProfitability + '">Last Month</a>');	
     $('#sub-nav .sub-nav-tabs').append('<li><a href="' + threeMonthProfitability + '">Last 3 Months</a>');	
-  }, 500);
+  });
   
-})();
+})(window.$jq);

@@ -31,11 +31,9 @@ gulp.task('build-html', () => (
       .pipe(browserSync.stream())
 ));
 
-gulp.task('compile', ['build-style', 'build-script', 'build-html'], () => {
-  return;
-});
+gulp.task('compile', ['build-style', 'build-script', 'build-html']);
 
-gulp.task('default', ['build-style', 'build-script', 'build-html'], () => {
+gulp.task('default', ['compile'], () => {
   browserSync.init({ 
     server: {
       baseDir: './dist',
