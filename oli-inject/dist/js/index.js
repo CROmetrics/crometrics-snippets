@@ -73,9 +73,14 @@ let $template = (popup, json) => {
   let parentUri = Url.parse(popup.url);
   console.log(popup, json, parentUri);
 
-  let setParam = paramValue => {
-    let query = parentUri.query && parentUri.query.replace(new RegExp(`${json.query_param}=[^&]*`, 'ig'), '') || '';
-    window.opener.location = `${parentUri.protocol}//${parentUri.host}${parentUri.pathname}?${json.query_param}=${paramValue}${query ? '&' + query : ''}${parentUri.hash || ''}`;
+  const getNewUrl = (paramValue, optimizelyDisable = false) => {
+    let query = parentUri.query && parentUri.query.replace(new RegExp(`${json.query_param}=[^&]*`, 'ig'), '').replace(/^&+/, '') || '';
+    if (optimizelyDisable && query.indexOf('optimizely_disable=true') === -1) query = 'optimizely_disable=true' + (query.length ? '&' + query : '');
+    return `${parentUri.protocol}//${parentUri.host}${parentUri.pathname}?${json.query_param}=${paramValue}${query.length ? '&' + query : ''}${parentUri.hash || ''}`;
+  };
+
+  const setParam = (...args) => {
+    window.opener.location = getNewUrl(...args);
     window.close();
   };
   let $el = $('<div>');
@@ -89,14 +94,20 @@ let $template = (popup, json) => {
       $vLi.append(`<h5>Pages:</h5>`);
       let $ul = $(`<ul style="padding-left: 20px;">`).appendTo($vLi);
       for (let page of json.pages) {
+        let tag = variation.tag + '.' + page.tag;
         let $li = $(`<li>
             <br>
-            <ID: <code>${variation.tag + '.' + page.tag}</code><br>
-            <small><a target="_blank" href="/${variation.tag + '.' + page.tag}.js">${variation.tag + '.' + page.tag}.js</a></small>
-            <small><a target="_blank" href="/${variation.tag + '.' + page.tag}.css">${variation.tag + '.' + page.tag}.css</a></small>
+            <ID: <code>${tag}</code><br>
+            <small><a target="_blank" href="/${tag}.js">${tag}.js</a></small>
+            <small><a target="_blank" href="/${tag}.css">${tag}.css</a></small>
           </li>`).appendTo($ul);
-        $(`<button class="btn btn-primary">${page.name}</button>`).click(() => {
-          setParam(variation.tag + '.' + page.tag);
+        $(`<a href="${getNewUrl(tag, true)}" class="btn btn-primary">${page.name} + PJS</a>`).click(e => {
+          e.preventDefault();
+          setParam(tag, true);
+        }).prependTo($li);
+        $(`<a href="${getNewUrl(tag)}" class="btn btn-primary">${page.name}</a>`).click(e => {
+          e.preventDefault();
+          setParam(tag);
         }).prependTo($li);
       }
     }
@@ -111,8 +122,13 @@ let $template = (popup, json) => {
         <br>
         <small><a target="_blank" href="/${v}/inject.js">inject.js</a></small>
       </li>`).appendTo($ol);
-      $(`<button class="btn btn-primary">${json.variations[v]}</button>`).click(() => {
+      $(`<a href="${getNewUrl(v)}" class="btn btn-primary">${json.variations[v]}</a>`).click(e => {
+        e.preventDefault();
         setParam(v);
+      }).prependTo($li);
+      $(`<a href="${getNewUrl(v, true)}" class="btn btn-primary">${json.variations[v]} + PJS</a>`).click(e => {
+        e.preventDefault();
+        setParam(v, true);
       }).prependTo($li);
     }
     $el.append(`<a target="_blank" class="btn btn-default" href="/experiment.css">experiment.css</a>`);

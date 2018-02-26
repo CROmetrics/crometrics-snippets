@@ -5,12 +5,12 @@ let $template = (popup, json) => {
   console.log(popup, json, parentUri);
 
   const getNewUrl = (paramValue, optimizelyDisable = false) => {
-    let query = parentUri.query && parentUri.query.replace(new RegExp(`${json.query_param}=[^&]*`, 'ig'), '') || '';
-    if (optimizelyDisable && parentUri.query.indexOf('optimizely_disable=true' === -1)) query += '&optimizely_disable=true';
-    return `${parentUri.protocol}//${parentUri.host}${parentUri.pathname}?${json.query_param}=${paramValue}${query ? '&' + query : ''}${parentUri.hash || ''}`;
+    let query = parentUri.query && parentUri.query.replace(new RegExp(`${json.query_param}=[^&]*`, 'ig'), '').replace(/^&+/, '') || '';
+    if (optimizelyDisable && query.indexOf('optimizely_disable=true') === -1) query = 'optimizely_disable=true' + (query.length ? '&' + query : '');
+    return `${parentUri.protocol}//${parentUri.host}${parentUri.pathname}?${json.query_param}=${paramValue}${query.length ? '&' + query : ''}${parentUri.hash || ''}`;
   };
 
-  let setParam = (...args) => {
+  const setParam = (...args) => {
     window.opener.location = getNewUrl(...args);
     window.close();
   };
@@ -25,14 +25,20 @@ let $template = (popup, json) => {
       $vLi.append(`<h5>Pages:</h5>`);
       let $ul = $(`<ul style="padding-left: 20px;">`).appendTo($vLi);
       for (let page of json.pages) {
+        let tag = variation.tag + '.' + page.tag;
         let $li = $(`<li>
             <br>
-            <ID: <code>${variation.tag + '.' + page.tag}</code><br>
-            <small><a target="_blank" href="/${variation.tag + '.' + page.tag}.js">${variation.tag + '.' + page.tag}.js</a></small>
-            <small><a target="_blank" href="/${variation.tag + '.' + page.tag}.css">${variation.tag + '.' + page.tag}.css</a></small>
+            <ID: <code>${tag}</code><br>
+            <small><a target="_blank" href="/${tag}.js">${tag}.js</a></small>
+            <small><a target="_blank" href="/${tag}.css">${tag}.css</a></small>
           </li>`).appendTo($ul);
-        $(`<button class="btn btn-primary">${page.name}</button>`).click(() => {
-          setParam(variation.tag + '.' + page.tag);
+        $(`<a href="${getNewUrl(tag,true)}" class="btn btn-primary">${page.name} + PJS</a>`).click(e => {
+          e.preventDefault();
+          setParam(tag, true);
+        }).prependTo($li);
+        $(`<a href="${getNewUrl(tag)}" class="btn btn-primary">${page.name}</a>`).click(e => {
+          e.preventDefault();
+          setParam(tag);
         }).prependTo($li);
       }
     }
@@ -58,7 +64,7 @@ let $template = (popup, json) => {
     }
     $el.append(`<a target="_blank" class="btn btn-default" href="/experiment.css">experiment.css</a>`);
   } else if (json.hosting == 'extension') {
-    $(`<button class="btn btn-primary">Preview Extension</button>`).click(()=>{
+    $(`<button class="btn btn-primary">Preview Extension</button>`).click(() => {
       setParam('extension');
     }).appendTo($el);
     $el.append(`<br>`);
