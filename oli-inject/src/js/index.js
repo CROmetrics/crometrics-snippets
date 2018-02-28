@@ -26,20 +26,21 @@ let $template = (popup, json) => {
       let $ul = $(`<ul style="padding-left: 20px;">`).appendTo($vLi);
       for (let page of json.pages) {
         let tag = variation.tag + '.' + page.tag;
-        let $li = $(`<li>
-            <br>
-            <ID: <code>${tag}</code><br>
-            <small><a target="_blank" href="/${tag}.js">${tag}.js</a></small>
-            <small><a target="_blank" href="/${tag}.css">${tag}.css</a></small>
-          </li>`).appendTo($ul);
-        $(`<a href="${getNewUrl(tag,true)}" class="btn btn-primary">${page.name} + PJS</a>`).click(e => {
-          e.preventDefault();
-          setParam(tag, true);
-        }).prependTo($li);
+        let $li = $(`<li>`).appendTo($ul);
         $(`<a href="${getNewUrl(tag)}" class="btn btn-primary">${page.name}</a>`).click(e => {
           e.preventDefault();
           setParam(tag);
-        }).prependTo($li);
+        }).appendTo($li);
+        $(`<a href="${getNewUrl(tag,true)}" class="btn btn-warning">+ PJS</a>`).click(e => {
+          e.preventDefault();
+          setParam(tag, true);
+        }).appendTo($li);
+        $li.append(`
+          <br>
+          ID: <code>${tag}</code><br>
+          <a class="btn btn-xs btn-default" target="_blank" href="/${tag}.js">${tag}.js</a>
+          <a class="btn btn-xs btn-default" target="_blank" href="/${tag}.css">${tag}.css</a>
+        `);
       }
     }
     $el.append(`<a target="_blank" class="btn btn-default" href="/shared.js">shared.js</a>`);
