@@ -311,31 +311,35 @@
       return this.$makeTabs(tabs).addClass('vertical');
     }
     $vwo() {
+      let tabs = [];
       tabs.push(["Info", 
       `<div class="col-3">
         <dl class="box">
           <dt>Account Owner</dt>
-          <dd>${_vwo_acc_id.accountId}</dd>
+          <dd>${_vwo_acc_id}</dd>
         </dl>
         <dl class="box">
-          <dt>Pages</dt>
+          <dt>Experiments</dt>
           <dd>${Object.keys(_vwo_exp).length}</dd>
         </dl>
         <dl class="box">
-          <dt>Events</dt>
-          <dd>${Object.keys(data.events).length}</dd>
+          <dt>Ask for more...</dt>
+          <dd>Seriously what would you like to know?</dd>
         </dl>
       </div>`]);
 
       let experiments = '';
-      for (let i in Object.keys(_vwo_exp) ){
-        let item = _vwo_exp[i];
-        experiments += `<label class="${item.status === "Running" ? 'in' : 'out'} ${item.status === "Running" ? 'active' : 'paused'}">${item.name}</label>`;
+      let keys = Object.keys(_vwo_exp);
+      for (let i in keys ){
+        let item = _vwo_exp[keys[i]];
+        experiments += `<label class="${item.status === "RUNNING" ? 'in' : 'out'} ${item.status === "RUNNING" ? 'active' : 'paused'}">${item.name}</label>`;
       }
       tabs.push(['Experiments', `
         <h2>Experiments:</h2>
         ${experiments || '<label class="badge badge-danger">There are no Experiments.</label>'}
       `]);
+
+      return this.$makeTabs(tabs).addClass('vertical');
     }
     $optimizelyX(){
       let data = this.optimizelyX;
