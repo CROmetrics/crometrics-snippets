@@ -87,3 +87,12 @@ A tampermonkey/greasemonkey script that adds a button to the optimizely interfac
 ***Usage:*** Run the bookmarklet on an Optimizely preview link. Run it again to bring the QA ball back.
 
 ***Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/optimizely/hide-ball.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>.***
+
+
+
+
+## Opt Out of Optimziely
+Description: Sets the cookie `optimizely_opt_out=true`.
+***Usage:*** Run the bookmarklet on any site that you want to be opted out of Optimizely.  Useful for sites where it is either  clunky or you are unable to set the cookie via a URL query parameter.
+
+***Install the <a href="javascript:fetch('https://crometrics.github.io/crometrics-snippets/optimizely/opt-out.js').then(r=>r.text()).then(t=>new Function(t)())">bookmarklet</a>.***

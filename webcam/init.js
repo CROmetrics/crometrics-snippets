@@ -90,7 +90,7 @@
           navigator.getUserMedia(
             {video: true}, 
             (stream)=>{
-              video.src = window.URL.createObjectURL(stream);
+              video.srcObject = stream;
             }, 
             (e)=>{
               //video error
