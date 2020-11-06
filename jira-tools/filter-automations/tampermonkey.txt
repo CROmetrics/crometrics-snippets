@@ -1,0 +1,15 @@
+// ==UserScript==
+// @name         jira filter
+// @namespace    https://crometrics.atlassian.net/
+// @version      0.1
+// @description  Filter out automations on jira notifications
+// @author       Jared Schoen
+// @match        https://crometrics.atlassian.net/*
+// @exclude      https://crometrics.atlassian.net/home/notificationsDrawer/*
+// @grant        none
+// ==/UserScript==
+
+var scriptElement = document.createElement('script');
+scriptElement.type = 'text/javascript';
+scriptElement.src = 'https://cdn.jsdelivr.net/gh/CROmetrics/crometrics-snippets/jira-tools/filter-automations/filter-automations.js';
+document.head.appendChild(scriptElement);

@@ -3,6 +3,7 @@
  * @author jared.schoen@crometrics.com (09/15/20)
  * 
  * Filters out unnecessary automated notifications in Jira
+ * https://www.jsdelivr.com/ for CDN 
  */
 
 (function() {
