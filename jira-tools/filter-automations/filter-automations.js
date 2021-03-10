@@ -10,7 +10,7 @@
     'use strict';
 
     // filter text
-    const filterValues = /Dave Albert updated|Mike Leydet updated|client dashboard updated|Jira Misc Workflow Extensions updated|Smart Checklist updated an issue/;
+    const filterValues = /Dave Albert updated|Mike Leydet updated|Michael Leydet updated|client dashboard updated|Jira Misc Workflow Extensions updated|Smart Checklist updated an issue/;
 
     // create styles for filter
     const notificationsFilterStylesHTML = `
