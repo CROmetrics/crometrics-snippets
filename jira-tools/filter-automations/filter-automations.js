@@ -10,7 +10,7 @@
     'use strict';
 
     // filter text
-    const filterValues = /Dave Albert updated|Mike Leydet updated|Michael Leydet updated|client dashboard updated|Jira Misc Workflow Extensions updated|Smart Checklist updated an issue/;
+    const filterValues = /Dave Albert updated|Mike Leydet updated|Michael Leydet updated|client dashboard updated|Jira Misc Workflow Extensions updated|Smart Checklist updated|Cro Metrics updated/;
 
     // create styles for filter
     const notificationsFilterStylesHTML = `
@@ -132,13 +132,13 @@
         const iframeDoc = e.target.closest('html');
         // console.log('TEST filter clicked and checked =', e.target.checked);
         if (e.target.checked) {
-          activeObserver = observeSelector(iframeDoc, 'ul[class^="NotificationsList"] li[class^="NotificationItem"]', item => {
+          activeObserver = observeSelector(iframeDoc, 'section[role="feed"] article', item => {
             if (filterValues.test(item.innerText))
               item.classList.add('cro-filter-out');
           });
           window.localStorage.setItem('cro-filter-on', 'true');
         } else {
-          activeObserver = observeSelector(iframeDoc, 'ul[class^="NotificationsList"] li[class^="NotificationItem"].cro-filter-out', item => {
+          activeObserver = observeSelector(iframeDoc, 'section[role="feed"] article.cro-filter-out', item => {
             item.classList.remove('cro-filter-out');
           });
           window.localStorage.setItem('cro-filter-on', 'false');
@@ -166,22 +166,22 @@
 
     observeSelector(document, 'body[class] > .atlaskit-portal-container', notificationContainer => {
       // console.log('notificationContainer', notificationContainer);
-      if (notificationContainer.querySelector('iframe[src*="notificationsDrawer"]')) {
-        const iframeDoc = notificationContainer.querySelector('iframe[src*="notificationsDrawer"]').contentDocument;
+      if (notificationContainer.querySelector('iframe[src*="notificationList"]')) {
+        const iframeDoc = notificationContainer.querySelector('iframe[src*="notificationList"]').contentDocument;
         addFilter(iframeDoc);
       }
       const observer = new MutationObserver(() => {
         window.setTimeout(() => {
           // console.log('TEST mutation', mutations);
-          // console.log('mutation check', (!document.querySelector('body[class] > .atlaskit-portal-container iframe[src*="notificationsDrawer"]') || document.querySelector('body[class] > .atlaskit-portal-container .cro-notifications-filter')));
+          // console.log('mutation check', (!document.querySelector('body[class] > .atlaskit-portal-container iframe[src*="notificationList"]') || document.querySelector('body[class] > .atlaskit-portal-container .cro-notifications-filter')));
           // console.log(notificationContainer.querySelector('iframe'));
           // console.log(document.querySelector('body[class] > .atlaskit-portal-container iframe'));
-          // console.log(notificationContainer.querySelector('iframe[src*="notificationsDrawer"]'));
-          // console.log(document.querySelector('body[class] > .atlaskit-portal-container iframe[src*="notificationsDrawer"]'));
-          if (!document.querySelector('body[class] > .atlaskit-portal-container iframe[src*="notificationsDrawer"]') || document.querySelector('body[class] > .atlaskit-portal-container .cro-notifications-filter'))
+          // console.log(notificationContainer.querySelector('iframe[src*="notificationList"]'));
+          // console.log(document.querySelector('body[class] > .atlaskit-portal-container iframe[src*="notificationList"]'));
+          if (!document.querySelector('body[class] > .atlaskit-portal-container iframe[src*="notificationList"]') || document.querySelector('body[class] > .atlaskit-portal-container .cro-notifications-filter'))
             return;
 
-          const iframeDoc = document.querySelector('body[class] > .atlaskit-portal-container iframe[src*="notificationsDrawer"]').contentDocument;
+          const iframeDoc = document.querySelector('body[class] > .atlaskit-portal-container iframe[src*="notificationList"]').contentDocument;
           addFilter(iframeDoc);
         }, 0);
       });

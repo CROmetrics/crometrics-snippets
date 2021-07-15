@@ -6,6 +6,7 @@
 // @author       Jared Schoen
 // @match        https://crometrics.atlassian.net/*
 // @exclude      https://crometrics.atlassian.net/home/notificationsDrawer/*
+// @exclude      https://crometrics.atlassian.net/home/notificationList/*
 // @grant        none
 // ==/UserScript==
 
@@ -13,3 +14,4 @@ var scriptElement = document.createElement('script');
 scriptElement.type = 'text/javascript';
 scriptElement.src = 'https://cdn.jsdelivr.net/gh/CROmetrics/crometrics-snippets/jira-tools/filter-automations/filter-automations.js';
 document.head.appendChild(scriptElement);
+
