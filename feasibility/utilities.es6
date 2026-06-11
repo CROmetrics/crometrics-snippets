@@ -1,6 +1,9 @@
 (function () {
   'use strict';
 
+  const defaultDataLayerKey = 'dataLayer';
+  const defaultDataLayerEvent = `crometrics:datalayer`;
+
   function globals(globals) {
     const iframeEl = document.createElement('iframe');
     iframeEl.src = 'about:blank';
